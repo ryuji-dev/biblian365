@@ -16,7 +16,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const { page } = await searchParams;
   const currentPage = parseInt(page || '1');
   const itemsPerPage = 10;
-  
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -43,15 +43,22 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   // 전반적인 통계 데이터
   const { count: userCount } = await supabase.from("user_profiles").select("*", { count: 'exact', head: true });
   const today = new Date().toISOString().split('T')[0];
-  const { count: todayCheckins } = await supabase.from("devotion_checkins").select("*", { count: 'exact', head: true }).eq("checkin_date", today);
-  
+  const { data: todayCheckinData } = await supabase
+    .from("devotion_checkins")
+    .select("user_id")
+    .eq("checkin_date", today);
+
+  const todayCheckins = todayCheckinData
+    ? new Set((todayCheckinData as { user_id: string }[]).map(c => c.user_id)).size
+    : 0;
+
   // 교우 목록 (페이지네이션 적용)
   const { data: usersData, count: totalUsers } = await supabase
     .from("user_profiles")
     .select("id, email, full_name, role, created_at", { count: 'exact' })
     .order("created_at", { ascending: false })
     .range((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage - 1);
-    
+
   const memberList = usersData as UserProfile[] | null;
   const totalPages = Math.ceil((totalUsers || 0) / itemsPerPage);
 
@@ -168,10 +175,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                         <td className="py-5 text-right">
                           <span className={cn(
                             "px-3 py-1 rounded-full text-[10px] font-normal tracking-widest uppercase border border-transparent",
-                            u.role === 'admin' ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/10" : 
-                            u.role === 'leader' ? "bg-primary/20 text-primary border-primary/10" : "bg-zinc-800 text-zinc-500"
+                            u.role === 'admin' ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/10" :
+                              u.role === 'leader' ? "bg-primary/20 text-primary border-primary/10" : "bg-zinc-800 text-zinc-500"
                           )}>
-                            {u.role === 'admin' ? 'Pastor' : u.role === 'leader' ? 'Leader' : 'Member'}
+                            {u.role === 'admin' ? '목사님' : u.role === 'leader' ? '리더' : '교우'}
                           </span>
                         </td>
                       </tr>

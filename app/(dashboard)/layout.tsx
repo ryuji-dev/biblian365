@@ -72,7 +72,7 @@ export default function DashboardLayout({
   const navigation = [
     { name: '대시보드', href: '/dashboard', icon: Home },
     { name: '경건시간', href: '/devotion', icon: Book },
-    { name: '성경통독', href: '/reading/2026', icon: BookOpen },
+    { name: '성경통독', href: '/reading', icon: BookOpen },
     { name: '프로필', href: '/profile', icon: User },
   ];
 
