@@ -32,32 +32,42 @@ export function CheckinCalendar({ checkinDates, onDateClick }: CheckinCalendarPr
   };
 
   return (
-    <div className="w-full bg-white rounded-xl shadow-sm border p-4">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-bold">
+    <div className="w-full">
+      <div className="flex items-center justify-between mb-8 px-2">
+        <h2 className="text-2xl text-white">
           {format(currentMonth, "yyyy년 M월", { locale: ko })}
         </h2>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={prevMonth}>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={prevMonth}
+            className="rounded-xl border-white/5 bg-white/5 hover:bg-white/10 text-white"
+          >
             <ChevronLeft className="w-4 h-4" />
           </Button>
-          <Button variant="outline" size="icon" onClick={nextMonth}>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={nextMonth}
+            className="rounded-xl border-white/5 bg-white/5 hover:bg-white/10 text-white"
+          >
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-2 mb-2">
         {["월", "화", "수", "목", "금", "토", "일"].map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+          <div key={day} className="text-center text-xs font-bold text-zinc-500 uppercase tracking-widest py-3">
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-2">
         {Array.from({ length: prefixDays }).map((_, i) => (
-          <div key={`empty-${i}`} className="h-12 md:h-16" />
+          <div key={`empty-${i}`} className="h-16 md:h-24 rounded-2xl bg-white/[0.02]" />
         ))}
         
         {days.map((day) => {
@@ -69,24 +79,29 @@ export function CheckinCalendar({ checkinDates, onDateClick }: CheckinCalendarPr
               key={day.toString()}
               onClick={() => onDateClick(format(day, "yyyy-MM-dd"))}
               className={cn(
-                "h-12 md:h-16 flex flex-col items-center justify-center rounded-lg transition-all relative group",
-                today ? "border-2 border-primary/30" : "border border-transparent",
-                checked ? "bg-primary/10" : "hover:bg-gray-50"
+                "h-16 md:h-24 flex flex-col items-center justify-center rounded-2xl transition-all duration-300 relative group overflow-hidden",
+                today 
+                  ? "bg-primary/20 border border-primary/40 shadow-[0_0_20px_rgba(124,58,237,0.1)]" 
+                  : "bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] hover:border-white/10",
+                checked && !today && "bg-primary/10 border-primary/20"
               )}
             >
               <span className={cn(
-                "text-sm font-medium",
-                today ? "text-primary font-bold" : "text-gray-700",
-                checked && "text-primary"
+                "text-lg transition-colors duration-300",
+                today ? "text-primary" : "text-zinc-400 group-hover:text-white",
+                checked && "text-white"
               )}>
                 {format(day, "d")}
               </span>
               
               {checked && (
-                <div className="mt-1">
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                <div className="mt-2 flex gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_rgba(124,58,237,0.8)]" />
                 </div>
               )}
+
+              {/* Hover highlight effect */}
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
             </button>
           );
         })}

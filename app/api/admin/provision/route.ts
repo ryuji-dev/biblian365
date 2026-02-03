@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,25 +10,57 @@ export async function POST(req: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     // 관리자 권한 확인
-    const { data: profile } = await supabase
+    const { data: profileData } = await supabase
       .from("user_profiles")
       .select("role")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role !== 'admin') {
+    const profile = profileData as { role: string } | null;
+
+    if (profile?.role !== 'admin' && profile?.role !== 'leader') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { email, fullName, temporaryPassword, role } = await req.json();
+    const { email, fullName, temporaryPassword, role = 'user' } = await req.json();
 
-    // 서비스 롤 키가 있는 관리자 클라이언트 필요 (Next.js 서버 사이드에서 직접 처리는 지양하고 Edge Function 권장)
-    // 하지만 지금은 테스트를 위해 안내 메시지만 반환
-    return NextResponse.json({ 
-      error: "보안을 위해 계정 발급은 Supabase Edge Function을 통해서만 수행됩니다. deployment-guide.md의 내용을 배포해주세요." 
-    }, { status: 400 });
+    if (!email || !fullName) {
+      return NextResponse.json({ error: "이메일과 이름은 필수입니다." }, { status: 400 });
+    }
+
+    const adminClient = createAdminClient();
+
+    // 1. Auth 사용자 생성
+    const { data: authUser, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password: temporaryPassword || '1111',
+      email_confirm: true, // 발급 즉시 바로 로그인 가능하도록 설정
+      user_metadata: { full_name: fullName }
+    });
+
+    if (authError) {
+      return NextResponse.json({ error: `계정 생성 실패: ${authError.message}` }, { status: 400 });
+    }
+
+    // 2. User Profiles 테이블 업데이트 (트리거가 없을 경우를 대비해 명시적 수행)
+    const { error: profileError } = await (adminClient
+      .from('user_profiles') as any)
+      .upsert({
+        id: authUser.user.id,
+        email,
+        full_name: fullName,
+        role: role as 'user' | 'leader' | 'admin',
+        first_login: true // 첫 로그인 후 비번 변경 유도용
+      });
+
+    if (profileError) {
+      console.error('Profile creation error:', profileError);
+    }
+
+    return NextResponse.json({ message: "성공적으로 계정이 발급되었습니다." });
 
   } catch (error: any) {
+    console.error('Provisioning error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

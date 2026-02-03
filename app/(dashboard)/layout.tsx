@@ -71,13 +71,13 @@ export default function DashboardLayout({
 
   const navigation = [
     { name: '대시보드', href: '/dashboard', icon: Home },
-    { name: '경건시간', href: '/dashboard/devotion', icon: Book },
-    { name: '성경통독', href: '/dashboard/reading', icon: BookOpen },
-    { name: '프로필', href: '/dashboard/profile', icon: User },
+    { name: '경건시간', href: '/devotion', icon: Book },
+    { name: '성경통독', href: '/reading/2026', icon: BookOpen },
+    { name: '프로필', href: '/profile', icon: User },
   ];
 
   if (userRole === 'admin' || userRole === 'leader') {
-    navigation.push({ name: '관리자', href: '/dashboard/admin', icon: Shield });
+    navigation.push({ name: '관리자', href: '/admin', icon: Shield });
   }
 
   return (
@@ -99,12 +99,12 @@ export default function DashboardLayout({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-20 px-6">
-            <div className="flex items-center gap-4">
+            <Link href="/dashboard" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
               <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white font-black shadow-sm">
                 <BookOpenText className="w-7 h-7" />
               </div>
               <span className="font-black text-xl tracking-tighter text-white font-brand">BIBLIAN 365</span>
-            </div>
+            </Link>
             <button
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden text-muted-foreground hover:text-white transition-colors"

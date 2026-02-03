@@ -89,17 +89,22 @@ export function CheckinModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader>
-            <DialogTitle>{formatDateKorean(date)}</DialogTitle>
-            <DialogDescription>
+      <DialogContent className="sm:max-w-[480px] glass-dark border-white/5 p-8 rounded-[2.5rem]">
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-3xl text-white tracking-tight">
+              {formatDateKorean(date)}
+            </DialogTitle>
+            <DialogDescription className="text-zinc-500 text-lg">
               이날의 경건시간 기록을 입력하세요.
             </DialogDescription>
           </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="duration">수행 시간 (분)</Label>
+          
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <Label htmlFor="duration" className="text-sm font-bold text-zinc-400 uppercase tracking-wider ml-1">
+                수행 시간 (분)
+              </Label>
               <Input
                 id="duration"
                 type="number"
@@ -107,36 +112,54 @@ export function CheckinModal({
                 value={duration}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDuration(e.target.value)}
                 disabled={loading}
+                className="bg-white/5 border-white/10 rounded-2xl h-14 text-lg px-6 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/30 text-white"
               />
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="memo">한 줄 메모</Label>
+            <div className="space-y-3">
+              <Label htmlFor="memo" className="text-sm font-bold text-zinc-400 uppercase tracking-wider ml-1">
+                한 줄 메모
+              </Label>
               <Textarea
                 id="memo"
                 placeholder="말씀 묵상 내용이나 기도 제목 등"
                 value={memo}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMemo(e.target.value)}
                 disabled={loading}
+                className="bg-white/5 border-white/10 rounded-2xl min-h-[120px] text-lg p-6 focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-muted-foreground/30 text-white"
               />
             </div>
           </div>
-          <DialogFooter className="flex justify-between sm:justify-between w-full">
-            {initialData && (
+
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-0 sm:justify-between pt-4">
+            {initialData ? (
               <Button 
                 type="button" 
-                variant="destructive" 
+                variant="ghost" 
                 onClick={handleDelete}
                 disabled={loading}
+                className="text-zinc-500 hover:text-destructive hover:bg-destructive/10 rounded-xl px-6"
               >
-                삭제
+                기록 삭제
               </Button>
-            )}
-            <div className="flex gap-2 ml-auto">
-              <Button type="button" variant="outline" onClick={onClose}>
+            ) : <div />}
+            
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onClose}
+                className="border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-xl px-8"
+              >
                 취소
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? '저장 중...' : '저장하기'}
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8 shadow-lg shadow-primary/20"
+              >
+                {loading ? (
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                ) : '저장하기'}
               </Button>
             </div>
           </DialogFooter>

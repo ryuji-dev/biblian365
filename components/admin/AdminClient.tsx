@@ -8,98 +8,129 @@ import { Card, CardContent } from '@/components/ui/card';
 import { PlusCircle, Database, UserPlus } from 'lucide-react';
 
 interface AdminClientProps {
-  mode: 'users' | 'templates';
+  mode: 'users' | 'reset-password';
 }
 
 export function AdminClient({ mode }: AdminClientProps) {
   const [loading, setLoading] = useState(false);
-  const [year, setYear] = useState('2026');
 
-  // 계정 발급용 스테이트
+  // 스테이트
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [password, setPassword] = useState('WelcomeBiblian365!');
+  const [password, setPassword] = useState('1111');
 
-  const handleSeedTemplate = async () => {
-    if (!confirm(`${year}년 통독 템플릿을 생성하시겠습니까? (365일 샘플 데이터 포함)`)) return;
-    setLoading(true);
-    try {
-      const resp = await fetch('/api/admin/seed-template', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year: parseInt(year) }),
-      });
-      if (resp.ok) {
-        alert('템플릿 생성 완료!');
-      } else {
-        const data = await resp.json();
-        alert('에러: ' + data.error);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleProvisionUser = async (e: React.FormEvent) => {
+  const handleAction = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // 실제로는 Edge Function을 호출하는 것이 좋으나, 
-      // 여기서는 데모용으로 API Route를 통해 호출하는 척 하거나 
-      // Supabase Auth Admin API를 서버 사이드에서 호출하도록 유도
-      alert('사용자 발급 기능은 전용 Edge Function 배포 후 활성화됩니다. deployment-guide.md의 코드를 전용 대시보드에서 배포해주세요.');
+      const endpoint = mode === 'users' ? '/api/admin/provision' : '/api/admin/reset-password';
+      const body = mode === 'users' 
+        ? { email, fullName: name, temporaryPassword: password, role: 'user' }
+        : { email };
+
+      const resp = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await resp.json();
+
+      if (resp.ok) {
+        alert(mode === 'users' ? `${name} 교우님의 계정이 발급되었습니다.` : `${email} 계정의 비밀번호가 초기화되었습니다.`);
+        if (mode === 'users') {
+          setEmail('');
+          setName('');
+        }
+      } else {
+        alert('처리 중 오류 발생: ' + (data.error || '알 수 없는 에러'));
+      }
+    } catch (err) {
+      alert('네트워크 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
   };
 
-  if (mode === 'templates') {
+  if (mode === 'reset-password') {
     return (
-      <div className="space-y-4">
-        <div className="grid gap-2">
-          <Label htmlFor="year">대상 연도</Label>
+      <form onSubmit={handleAction} className="space-y-6 font-normal">
+        <div className="space-y-2 font-normal">
+          <Label htmlFor="reset-email" className="text-xs font-normal text-zinc-500 uppercase tracking-wider ml-1">초기화할 계정 이메일</Label>
           <Input 
-            id="year" 
-            value={year} 
-            onChange={(e) => setYear(e.target.value)} 
-            placeholder="2026"
+            id="reset-email" 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+            placeholder="example@email.com"
+            className="bg-white/5 border-white/10 rounded-2xl h-12 px-5 text-white focus:ring-orange-500/20 focus:border-orange-500/50 transition-all placeholder:text-zinc-700 font-normal"
           />
         </div>
         <Button 
-          onClick={handleSeedTemplate} 
+          type="submit" 
           disabled={loading} 
-          className="w-full flex gap-2"
+          className="w-full h-14 bg-orange-600 hover:bg-orange-500 text-white rounded-2xl text-lg transition-all flex gap-3 font-normal"
         >
-          <Database className="w-4 h-4" />
-          {year}년 템플릿 생성 (샘플 데이터)
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin font-normal" />
+          ) : '비밀번호 초기화'}
         </Button>
-        <p className="text-xs text-gray-400">
-          * 실제 정교한 통독표 데이터는 CSV 업로드 기능을 통해 구현할 것을 권장합니다.
-        </p>
-      </div>
+      </form>
     );
   }
 
   return (
-    <form onSubmit={handleProvisionUser} className="space-y-4">
-      <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="email">이메일</Label>
-          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+    <form onSubmit={handleAction} className="space-y-6 font-normal">
+      <div className="space-y-5 font-normal">
+        <div className="space-y-2 font-normal">
+          <Label htmlFor="email" className="text-xs font-normal text-zinc-500 uppercase tracking-wider ml-1">이메일 주소</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+            placeholder="example@email.com"
+            className="bg-white/5 border-white/10 rounded-2xl h-12 px-5 text-white focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-zinc-700 font-normal"
+          />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="name">이름</Label>
-          <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required />
+        <div className="space-y-2 font-normal">
+          <Label htmlFor="name" className="text-xs font-normal text-zinc-500 uppercase tracking-wider ml-1">교우 이름</Label>
+          <Input 
+            id="name" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            required 
+            placeholder="홍길동"
+            className="bg-white/5 border-white/10 rounded-2xl h-12 px-5 text-white focus:ring-primary/20 focus:border-primary/50 transition-all placeholder:text-zinc-700 font-normal"
+          />
         </div>
-        <div className="grid gap-2">
-          <Label htmlFor="pwd">임시 비밀번호</Label>
-          <Input id="pwd" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <div className="space-y-2 font-normal">
+          <Label htmlFor="pwd" className="text-xs font-normal text-zinc-500 uppercase tracking-wider ml-1">임시 비밀번호</Label>
+          <Input 
+            id="pwd" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            className="bg-white/5 border-white/10 rounded-2xl h-12 px-5 text-white focus:ring-primary/20 focus:border-primary/50 transition-all font-normal"
+          />
         </div>
       </div>
-      <Button type="submit" disabled={loading} className="w-full flex gap-2">
-        <UserPlus className="w-4 h-4" />
-        계정 발급하기
+      <Button 
+        type="submit" 
+        disabled={loading} 
+        className="w-full h-14 bg-primary hover:bg-primary/90 text-white rounded-2xl text-lg shadow-lg shadow-primary/20 transition-all flex gap-3 font-normal"
+      >
+        <UserPlus className="w-5 h-5" />
+        {loading ? (
+          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : '계정 발급 및 통지'}
       </Button>
+      <p className="text-center text-[11px] text-zinc-600 leading-relaxed px-4 font-normal">
+        * 임시 비밀번호는 기본적으로 '1111'로 세팅됩니다.<br/>
+        교우는 첫 로그인 시 비밀번호를 변경해야 합니다.
+      </p>
     </form>
   );
 }

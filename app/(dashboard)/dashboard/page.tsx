@@ -92,8 +92,10 @@ export default async function DashboardPage() {
                 )}
               </div>
               <div className={cn(
-                "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
-                todayCheckin ? "bg-primary text-white" : "bg-zinc-900 text-zinc-700"
+                "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500",
+                todayCheckin 
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]" 
+                  : "bg-zinc-900 text-zinc-700 group-hover:bg-primary group-hover:text-white group-hover:shadow-[0_0_20px_rgba(124,58,237,0.4)]"
               )}>
                 <Trophy className="w-6 h-6" />
               </div>
@@ -112,7 +114,7 @@ export default async function DashboardPage() {
           <CardContent>
             <div className="flex items-end justify-between">
               <div className="text-3xl text-white tracking-tight">{monthCheckins || 0}회</div>
-              <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center transition-all duration-500 group-hover:bg-orange-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]">
                 <Flame className="w-6 h-6" />
               </div>
             </div>
@@ -148,7 +150,7 @@ export default async function DashboardPage() {
           <CardContent>
             <div className="flex items-end justify-between">
               <div className="text-3xl text-white tracking-tight">{profile?.cumulative_readthrough_count || 0}회</div>
-              <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center transition-colors">
+              <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center transition-all duration-500 group-hover:bg-yellow-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]">
                 <Trophy className="w-6 h-6" />
               </div>
             </div>
@@ -163,7 +165,7 @@ export default async function DashboardPage() {
             <h3 className="text-3xl text-white tracking-wide">경건의 기록</h3>
             <p className="text-zinc-500 mt-3 text-lg font-medium">진실한 만남의 시간을 기록으로 남겨보세요</p>
           </div>
-          <Link href="/dashboard/devotion/checkin" className="mt-8 relative z-10">
+          <Link href="/devotion" className="mt-8 relative z-10">
             <Button className="w-full bg-primary hover:bg-primary/95 text-white rounded-2xl h-16 text-lg transition-colors">
               {todayCheckin ? '나의 기록 확인' : '오늘의 기록 남기기'}
             </Button>
@@ -176,7 +178,7 @@ export default async function DashboardPage() {
             <h3 className="text-3xl text-white tracking-wide">성경 통독표</h3>
             <p className="text-zinc-500 mt-3 text-lg font-medium">연간 계획을 따라 성경을 완독하세요</p>
           </div>
-          <Link href={`/dashboard/reading/${currentYear}`} className="mt-8 relative z-10">
+          <Link href={`/reading/${currentYear}`} className="mt-8 relative z-10">
             <Button variant="outline" className="w-full border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-16 text-lg transition-colors">
               통독표 보기
             </Button>
