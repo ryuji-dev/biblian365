@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
 
     const { templateId, year } = await req.json();
 
-    const { data, error } = await supabase
-      .from("user_reading_plans")
+    const { data, error } = await (supabase
+      .from("user_reading_plans") as any)
       .insert({
         user_id: user.id,
         template_id: templateId,

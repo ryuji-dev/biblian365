@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
 
     const { planId, date, memo } = await req.json();
 
-    const { data, error } = await supabase
-      .from("user_reading_completions")
+    const { data, error } = await (supabase
+      .from("user_reading_completions") as any)
       .insert({
         user_id: user.id,
         plan_id: planId,
@@ -41,8 +41,8 @@ export async function DELETE(req: NextRequest) {
 
     const { planId, date } = await req.json();
 
-    const { error } = await supabase
-      .from("user_reading_completions")
+    const { error } = await (supabase
+      .from("user_reading_completions") as any)
       .delete()
       .eq("user_id", user.id)
       .eq("plan_id", planId)

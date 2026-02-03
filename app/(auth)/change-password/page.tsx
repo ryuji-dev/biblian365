@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 export default function ChangePasswordPage() {
   const router = useRouter();
   const supabase = createClient();
-  
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -23,7 +23,7 @@ export default function ChangePasswordPage() {
   useEffect(() => {
     async function checkUser() {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         router.push('/login');
         return;
@@ -35,7 +35,7 @@ export default function ChangePasswordPage() {
         .from('user_profiles')
         .select('first_login')
         .eq('id', user.id)
-        .single();
+        .single() as { data: { first_login: boolean } | null };
 
       setIsFirstLogin(profile?.first_login || false);
     }
@@ -96,9 +96,9 @@ export default function ChangePasswordPage() {
 
       // first_login 플래그 업데이트
       if (userId) {
-        await supabase
-          .from('user_profiles')
-          .update({ 
+        await (supabase
+          .from('user_profiles') as any)
+          .update({
             first_login: false,
             last_password_change: new Date().toISOString()
           })
@@ -119,8 +119,8 @@ export default function ChangePasswordPage() {
       <CardHeader>
         <CardTitle>비밀번호 변경</CardTitle>
         <CardDescription>
-          {isFirstLogin 
-            ? '처음 로그인하셨습니다. 새로운 비밀번호를 설정해주세요.' 
+          {isFirstLogin
+            ? '처음 로그인하셨습니다. 새로운 비밀번호를 설정해주세요.'
             : '새로운 비밀번호를 입력해주세요.'}
         </CardDescription>
       </CardHeader>

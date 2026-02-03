@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Upsert checkin
-    const { data, error } = await supabase
-      .from("devotion_checkins")
+    const { data, error } = await (supabase
+      .from("devotion_checkins") as any)
       .upsert({
         user_id: user.id,
         checkin_date: checkinDate,
@@ -65,8 +65,8 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Date is required" }, { status: 400 });
     }
 
-    const { error } = await supabase
-      .from("devotion_checkins")
+    const { error } = await (supabase
+      .from("devotion_checkins") as any)
       .delete()
       .eq("user_id", user.id)
       .eq("checkin_date", date);

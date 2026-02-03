@@ -24,14 +24,14 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
     .select("*, reading_plan_templates(title, description)")
     .eq("user_id", user.id)
     .eq("year", parsedYear)
-    .single();
+    .single() as any;
 
   if (!userPlan) {
-    // 플랜이 없으면 템플릿 목록 보여주기
+    // 아직 배포용 템플릿만 선택하거나 전체 목록을 가져옵니다
     const { data: templates } = await supabase
-      .from("reading_plan_templates")
-      .select("*")
-      .eq("year", parsedYear);
+      .from('reading_plan_templates')
+      .select('id, title, description')
+      .eq('year', parsedYear) as { data: { id: string, title: string, description: string | null }[] | null };
 
     return (
       <div className="p-6 max-w-4xl mx-auto">
@@ -68,15 +68,15 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
     .from("reading_plan_template_items")
     .select("*")
     .eq("template_id", userPlan.template_id)
-    .order("date", { ascending: true });
+    .order("date", { ascending: true }) as any;
 
   // 사용자의 완료 기록 가져오기
   const { data: completions } = await supabase
     .from("user_reading_completions")
     .select("date")
-    .eq("plan_id", userPlan.id);
+    .eq("plan_id", userPlan.id) as any;
 
-  const completedDates = completions?.map(c => c.date) || [];
+  const completedDates = completions?.map((c: any) => c.date) || [];
   const progress = Math.round((completedDates.length / (templateItems?.length || 365)) * 100);
 
   return (
@@ -95,20 +95,20 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
             <p className="text-2xl font-bold text-primary">{progress}%</p>
           </div>
           <div className="w-12 h-12 rounded-full border-4 border-primary/10 flex items-center justify-center relative">
-             <div 
-              className="absolute inset-0 rounded-full border-4 border-primary" 
+            <div
+              className="absolute inset-0 rounded-full border-4 border-primary"
               style={{ clipPath: `inset(${100 - progress}% 0 0 0)` }}
-             />
-             <span className="text-[10px] font-bold">{completedDates.length}일</span>
+            />
+            <span className="text-[10px] font-bold">{completedDates.length}일</span>
           </div>
         </div>
       </div>
 
-      <ReadingClient 
-        mode="view" 
-        planId={userPlan.id} 
-        items={templateItems || []} 
-        completedDates={completedDates} 
+      <ReadingClient
+        mode="view"
+        planId={userPlan.id}
+        items={templateItems || []}
+        completedDates={completedDates}
       />
     </div>
   );
