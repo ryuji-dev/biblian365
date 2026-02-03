@@ -43,25 +43,6 @@ export default function ChangePasswordPage() {
     checkUser();
   }, [router, supabase]);
 
-  const validatePassword = (pwd: string): string | null => {
-    if (pwd.length < 12) {
-      return '비밀번호는 최소 12자 이상이어야 합니다.';
-    }
-    if (!/[A-Z]/.test(pwd)) {
-      return '대문자를 최소 1개 포함해야 합니다.';
-    }
-    if (!/[a-z]/.test(pwd)) {
-      return '소문자를 최소 1개 포함해야 합니다.';
-    }
-    if (!/[0-9]/.test(pwd)) {
-      return '숫자를 최소 1개 포함해야 합니다.';
-    }
-    if (!/[^A-Za-z0-9]/.test(pwd)) {
-      return '특수문자를 최소 1개 포함해야 합니다.';
-    }
-    return null;
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,10 +55,8 @@ export default function ChangePasswordPage() {
       return;
     }
 
-    // 비밀번호 정책 검증
-    const validationError = validatePassword(newPassword);
-    if (validationError) {
-      setError(validationError);
+    if (newPassword.length < 6) {
+      setError('비밀번호는 최소 6자 이상이어야 합니다.');
       setLoading(false);
       return;
     }
@@ -106,7 +85,9 @@ export default function ChangePasswordPage() {
       }
 
       // 대시보드로 이동
-      router.push('/dashboard');
+      // 로그아웃 처리 후 로그인 페이지로 이동
+      await supabase.auth.signOut();
+      router.push('/login?message=비밀번호가 변경되었습니다. 다시 로그인해 주세요.');
     } catch (err) {
       console.error(err);
       setError('비밀번호 변경 중 오류가 발생했습니다.');
@@ -164,13 +145,6 @@ export default function ChangePasswordPage() {
             />
           </div>
 
-          <div className="bg-muted p-3 rounded-md text-xs space-y-1">
-            <p className="font-semibold">비밀번호 정책:</p>
-            <ul className="list-disc list-inside space-y-1">
-              <li>최소 12자 이상</li>
-              <li>대문자, 소문자, 숫자, 특수문자 각 1개 이상 포함</li>
-            </ul>
-          </div>
 
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">

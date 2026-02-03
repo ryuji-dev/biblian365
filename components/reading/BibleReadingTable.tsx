@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BIBLE_BOOKS, TOTAL_CHAPTERS, BibleBook } from '@/lib/constants/bible';
-import { BookOpen, CheckCircle2, Circle, Flame, Target, ChevronDown, ChevronUp, Book } from 'lucide-react';
+import { BookOpen, CheckCircle2, Flame, Target, ChevronDown, ChevronUp, Book, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BibleProgress {
@@ -323,18 +323,18 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
                     </CardContent>
                 </Card>
 
-                <Card className="glass-dark border-white/5 shadow-none overflow-hidden group hover:border-indigo-500/30 transition-all duration-500 rounded-[2rem]">
+                <Card className="glass-dark border-white/5 shadow-none overflow-hidden group hover:border-yellow-500/30 transition-all duration-500 rounded-[2rem]">
                     <CardHeader className="pb-2">
                         <CardTitle className="flex items-center gap-2 text-sm text-zinc-300 uppercase tracking-tight mb-2">
-                            <CheckCircle2 className="w-4 h-4 text-indigo-500" />
-                            총 통독 수
+                            <Trophy className="w-4 h-4 text-yellow-500" />
+                            누적 완독
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-end justify-between">
-                            <div className="text-3xl text-white tracking-tight">{totalReads}독</div>
-                            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center transition-all duration-500 group-hover:bg-indigo-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-                                <CheckCircle2 className="w-6 h-6" />
+                            <div className="text-3xl text-white tracking-tight">{totalReads}회</div>
+                            <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center transition-all duration-500 group-hover:bg-yellow-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]">
+                                <Trophy className="w-6 h-6" />
                             </div>
                         </div>
                     </CardContent>

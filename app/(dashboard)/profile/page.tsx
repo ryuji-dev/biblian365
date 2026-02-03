@@ -1,33 +1,87 @@
-'use client';
+import { createClient } from "@/lib/supabase/server";
+import { Settings, LogOut, Key } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User } from "lucide-react";
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-export default function ProfilePage() {
+  if (!user) return null;
+
+  // Fetch User Profile
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('role, email, full_name')
+    .eq('id', user.id)
+    .single() as { data: { role: 'admin' | 'leader' | 'user'; email: string; full_name: string } | null };
+
+  const roleLabel = profile?.role === 'admin' ? 'PASTOR' : profile?.role === 'leader' ? 'LEADER' : 'MEMBER';
+  const roleInitial = profile?.role === 'admin' ? 'P' : profile?.role === 'leader' ? 'L' : 'M';
+
   return (
-    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 animate-in fade-in duration-1000">
-      <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-white/5 p-6 md:p-10">
-        <div className="relative z-10 space-y-3">
-          <h1 className="text-2xl md:text-4xl text-white tracking-tight leading-tight">
-            내 프로필
-          </h1>
-          <p className="text-zinc-400 text-base md:text-lg font-medium">
-            계정 정보와 활동 통계를 확인하세요.
-          </p>
+    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      {/* Header Section - Inspired by User's Request */}
+      <div className="flex flex-col md:flex-row items-center gap-6 px-4">
+        <div className="w-20 h-20 rounded-[1.5rem] bg-indigo-500/10 border border-white/5 flex items-center justify-center text-indigo-500 font-bold text-3xl shadow-xl">
+          {roleInitial}
+        </div>
+
+        <div className="text-center md:text-left space-y-1">
+          <div className="flex flex-col md:flex-row md:items-center md:gap-3">
+            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight">
+              {profile?.full_name || '사용자'}
+            </h1>
+            <span className="text-zinc-500 text-lg md:text-xl font-medium tracking-tight">
+              {profile?.email}
+            </span>
+          </div>
+          <div className="text-zinc-500 text-sm font-bold tracking-widest uppercase opacity-70">
+            {roleLabel}
+          </div>
         </div>
       </div>
 
-      <Card className="glass-dark border-white/5 rounded-[2.5rem] p-8">
-        <CardHeader>
-          <CardTitle className="text-2xl text-white flex items-center gap-3">
-            <User className="w-6 h-6 text-primary" />
-            준비 중인 페이지입니다
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-zinc-500">곧 새로운 프로필 기능으로 찾아뵙겠습니다.</p>
-        </CardContent>
-      </Card>
+      {/* Settings / Actions */}
+      <div className="space-y-6">
+        <h2 className="text-xl text-white font-bold px-4 flex items-center gap-2">
+          <Settings className="w-5 h-5 text-zinc-500" />
+          계정 설정
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">
+          <ChangePasswordModal
+            trigger={
+              <Button variant="outline" className="w-full h-20 justify-between px-6 glass-dark border-white/5 hover:border-green-500/20 hover:bg-green-500/5 rounded-[1.5rem] group transition-all duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-green-500/10 transition-all duration-300 border border-white/5 group-hover:border-green-500/20">
+                    <Key className="w-5 h-5 text-zinc-400 group-hover:text-green-500 transition-colors duration-300" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-white font-bold group-hover:text-green-500 transition-colors duration-300">비밀번호 변경</div>
+                    <div className="text-xs text-zinc-500">계정 보안을 위해 정기적으로 변경하세요.</div>
+                  </div>
+                </div>
+              </Button>
+            }
+          />
+
+          <form action="/api/auth/signout" method="post" className="w-full">
+            <Button variant="outline" type="submit" className="w-full h-20 justify-between px-6 glass-dark border-white/5 hover:border-rose-500/20 hover:bg-rose-500/5 rounded-[1.5rem] group transition-all duration-300">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-rose-500/10 transition-all duration-300 border border-white/5 group-hover:border-rose-500/20">
+                  <LogOut className="w-5 h-5 text-zinc-400 group-hover:text-rose-500 transition-colors duration-300" />
+                </div>
+                <div className="text-left">
+                  <div className="text-white font-bold group-hover:text-rose-500 transition-colors duration-300">로그아웃</div>
+                  <div className="text-xs text-zinc-500">Biblian 365 세션을 종료합니다.</div>
+                </div>
+              </div>
+            </Button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }
