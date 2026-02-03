@@ -1,168 +1,92 @@
-# Biblian365 - 경건시간 & 성경통독 웹앱
+# 📖 Biblian365
 
-교회/청년부 내부용 경건시간 관리 및 성경 1년 통독 웹 애플리케이션
+> **교회 및 청년부 공동체를 위한 경건생활 관리 및 성경 1년 통독 웹 애플리케이션**
 
-## 기술 스택
+Biblian365는 성도들의 꾸준한 말씀 읽기와 기도 생활을 돕기 위해 설계된 모던 웹 서비스입니다. 관리자가 발급한 계정을 통해 개인별 목표를 설정하고 진행 상황을 시각적으로 확인할 수 있습니다.
 
-- **Frontend**: Next.js 16 (App Router) + TypeScript
-- **Backend**: Supabase (PostgreSQL + Auth + Edge Functions)
-- **Styling**: Tailwind CSS + shadcn/ui
-- **Deployment**: Vercel
+---
 
-## 주요 기능
+## 🛠 기술 스택
 
-### 1. 경건시간 관리
+- **Frontend**: `Next.js 16 (App Router)`, `TypeScript`, `React 19`
+- **Backend**: `Supabase` (Auth, PostgreSQL, SSR)
+- **Styling**: `Tailwind CSS`, `shadcn/ui`, `Lucide React`
+- **Deployment**: `Vercel`
 
-- 연간 경건시간 목표 설정
-- 일일 체크인 (날짜, 시간, 메모)
-- 연속 일수(Streak) 계산
-- 달성률 통계
+---
 
-### 2. 성경 통독
+## ✨ 핵심 기능
 
-- 2026년 날짜 기반 통독표
-- 날짜별 완료 체크
-- 진행률 시각화
-- **누적 통독 횟수** 자동 카운트
+### 1. 경건시간 (Devotion) 관리
+- **목표 설정**: 연간/일일 경건시간 목표를 설정하고 관리합니다.
+- **체크인**: 날짜별 수행 시간과 간단한 메모를 기록합니다.
+- **통계**:连续 일수(Streak) 표시 및 달성률 시각화 대시보드를 제공합니다.
 
-### 3. 관리자 기능
+### 2. 성경 통독 (Bible Reading)
+- **통독표**: 날짜별 읽기 본문이 포함된 1년 통독표를 제공합니다.
+- **진행 관리**: 읽은 본문을 체크하면 진행률이 자동으로 업데이트됩니다.
+- **누적 기록**: 성경을 여러 번 통독할 경우 회차별 기록을 관리합니다.
 
-- 사용자 계정 발급 (최대 30명)
-- 계정 잠금/비밀번호 리셋
-- 통독표 템플릿 관리
-- 전체 통계 조회
+### 3. 관리자 (Admin) 콘솔
+- **사용자 관리**: 이메일 기반 계정 생성, 권한 부여(Admin/Leader/User).
+- **상태 제어**: 계정 잠금/해제 및 비밀번호 초기화 기능.
+- **대시보드**: 전체 사용자의 참여 현황을 한눈에 파악합니다.
 
-## 개발 환경 설정
+---
 
-### 필수 요구사항
+## 🚀 빠른 시작 가이드
 
+### 1. 개발 환경 설정
+
+**필수 요구사항:**
 - Node.js 24 LTS 이상
-- Supabase 계정 (무료 티어)
-- Vercel 계정 (무료 티어, 배포용)
+- Supabase Project (무료 티어 가능)
 
-### 설치 방법
+**설치 과정:**
+```bash
+# 1. 저장소 복제 및 이동
+git clone https://github.com/your-repo/biblian365.git
+cd biblian365
 
-1. **Node.js 설치**
+# 2. 의존성 설치
+npm install
 
-   ```bash
-   # https://nodejs.org 에서 LTS 버전 다운로드 설치
-   node --version  # v24.x.x 확인
-   ```
-
-2. **의존성 설치**
-
-   ```bash
-   cd c:\\project\\test\\biblian365\\biblian365
-   npm install
-   ```
-
-3. **환경 변수 설정**
-
-   `.env.local.example`을 `.env.local`로 복사하고 Supabase 정보 입력:
-
-   ```bash
-   cp .env.local.example .env.local
-   ```
-
-   `.env.local` 파일 편집:
-
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-   SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-   ```
-
-4. **Supabase 데이터베이스 설정**
-
-   Supabase Dashboard → SQL Editor에서 실행:
-   - `database-schema.sql` 실행 (테이블 생성)
-   - `rls-policies.sql` 실행 (보안 정책)
-
-5. **개발 서버 실행**
-
-   ```bash
-   npm run dev
-   ```
-
-   브라우저에서 `http://localhost:3000` 접속
-
-## 프로젝트 구조
-
+# 3. 환경 변수 설정
+cp .env.local.example .env.local
+# .env.local 파일을 열어 Supabase URL 및 API Key를 입력하세요.
 ```
+
+### 2. 데이터베이스 및 인증 설정
+상세한 설정 방법은 [Supabase 설정 가이드](file:///Users/noah/Documents/projects/biblian365/biblian365/supabase-setting-guide.md)를 참고하세요.
+
+1. **SQL Editor**: 데이터베이스 테이블 및 RLS 정책을 설정합니다.
+2. **Auth Settings**: 이메일 템플릿 및 자동 발급 기능을 구성합니다.
+
+### 3. 실행
+```bash
+npm run dev
+```
+브라우저에서 `http://localhost:3000`을 엽니다.
+
+---
+
+## 📁 프로젝트 구조
+
+```text
 biblian365/
-├── app/
-│   ├── (auth)/              # 인증 관련 페이지
-│   │   ├── login/
-│   │   └── change-password/
-│   ├── (dashboard)/         # 대시보드 페이지
-│   │   ├── dashboard/       # 홈
-│   │   ├── devotion/        # 경건시간
-│   │   ├── reading/         # 통독
-│   │   ├── profile/         # 프로필
-│   │   └── admin/           # 관리자
-│   ├── api/                 # API Routes
-│   ├── layout.tsx
-│   └── globals.css
-├── components/
-│   ├── ui/                  # shadcn/ui 컴포넌트
-│   ├── devotion/            # 경건시간 컴포넌트
-│   ├── reading/             # 통독 컴포넌트
-│   └── admin/               # 관리자 컴포넌트
-├── lib/
-│   ├── supabase/            # Supabase 클라이언트
-│   └── utils/               # 유틸리티 함수
-├── types/
-│   └── database.types.ts    # DB 타입 정의
-└── README.md
+├── app/                  # Next.js App Router (페이지 및 레이아웃)
+│   ├── (auth)/           # 인증 (로그인, 비밀번호 변경)
+│   ├── (dashboard)/      # 핵심 기능 (데시보드, 경건시간, 통독, 프로필)
+│   └── api/              # API Serverless Functions
+├── components/           # UI 및 도메인 전용 컴포넌트
+├── lib/                  # 유틸리티 및 클라이언트 설정
+│   ├── supabase/         # Supabase 클라이언트 라이브러리
+│   └── utils.ts          # 공통 유틸리티 함수
+├── types/                # TypeScript 타입 정의
+└── public/               # 정적 애셋
 ```
 
-## 배포
+---
 
-전체 배포 가이드는 `deployment-guide.md` 참고
-
-### 간단 배포
-
-1. GitHub에 푸시
-2. Vercel에서 Import
-3. 환경 변수 설정
-4. 자동 배포
-
-## 설계 문서
-
-프로젝트 루트의 설계 문서들을 참조하세요:
-
-- `implementation_plan.md` - 전체 구현 계획
-- `architecture.md` - 시스템 아키텍처
-- `database-schema.sql` - DB 스키마
-- `rls-policies.sql` - 보안 정책
-- `api-design.md` - API 설계
-- `ui-structure.md` - UI 구조
-- `deployment-guide.md` - 배포 가이드
-
-## 현재 구현 상태
-
-✅ 프로젝트 초기 설정
-✅ 데이터베이스 스키마 설계
-✅ Supabase 클라이언트 설정
-✅ 인증 시스템 (로그인, 비밀번호 변경)
-✅ 대시보드 레이아웃
-✅ UI 컴포넌트 (Button, Card, Input, Label)
-
-🚧 작업 중:
-
-- 경건시간 기능 페이지
-- 통독 기능 페이지
-- API Routes
-- 관리자 페이지
-
-## 다음 단계
-
-1. Supabase 프로젝트 생성
-2. 환경 변수 설정 (`.env.local`)
-3. 데이터베이스 마이그레이션 실행
-4. 관리자 계정 생성
-5. 로컬에서 `npm install` 및 `npm run dev` 실행
-
-## 라이선스
-
-Internal Use Only - 교회 내부용
+## 📝 라이선스
+**Internal Use Only** - 본 프로젝트는 정해진 공동체 내부용으로만 사용이 제한됩니다.
