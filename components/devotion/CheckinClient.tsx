@@ -5,9 +5,19 @@ import { useRouter } from 'next/navigation';
 import { CheckinCalendar } from './CheckinCalendar';
 import { CheckinModal } from './CheckinModal';
 
+interface DevotionRecord {
+  id: string;
+  durationMinutes?: number;
+  memo?: string;
+  plannedStartTime?: string;
+  plannedEndTime?: string;
+  startTime?: string;
+  endTime?: string;
+}
+
 interface CheckinClientProps {
   checkinDates: string[];
-  initialCheckinDetails: Record<string, { durationMinutes?: number; memo?: string }>;
+  initialCheckinDetails: Record<string, DevotionRecord[]>;
 }
 
 export function CheckinClient({ checkinDates, initialCheckinDetails }: CheckinClientProps) {
@@ -26,11 +36,11 @@ export function CheckinClient({ checkinDates, initialCheckinDetails }: CheckinCl
 
   return (
     <>
-      <CheckinCalendar 
-        checkinDates={checkinDates} 
-        onDateClick={handleDateClick} 
+      <CheckinCalendar
+        checkinDates={checkinDates}
+        onDateClick={handleDateClick}
       />
-      
+
       {selectedDate && (
         <CheckinModal
           isOpen={isModalOpen}

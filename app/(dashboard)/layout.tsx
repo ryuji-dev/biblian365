@@ -5,11 +5,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
-import { 
-  Home, 
-  Book, 
-  BookOpen, 
-  User, 
+import {
+  Home,
+  Book,
+  BookOpen,
+  User,
   Shield,
   LogOut,
   Menu,
@@ -25,7 +25,7 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
-  
+
   const [userEmail, setUserEmail] = useState('');
   const [userRole, setUserRole] = useState<'user' | 'leader' | 'admin'>('user');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -33,18 +33,18 @@ export default function DashboardLayout({
   useEffect(() => {
     async function loadUser() {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         router.push('/login');
         return;
       }
 
-  // 사용자 상세 프로필 조회 (역할 및 잠금 상태 확인)
-  const { data: profile } = await supabase
-    .from('user_profiles')
-    .select('role, is_locked, first_login, email')
-    .eq('id', user.id)
-    .single() as { data: { role: 'user' | 'leader' | 'admin'; is_locked: boolean; first_login: boolean; email: string } | null };
+      // 사용자 상세 프로필 조회 (역할 및 잠금 상태 확인)
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('role, is_locked, first_login, email')
+        .eq('id', user.id)
+        .single() as { data: { role: 'user' | 'leader' | 'admin'; is_locked: boolean; first_login: boolean; email: string } | null };
 
       if (profile?.is_locked) {
         await supabase.auth.signOut();
@@ -84,7 +84,7 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-mesh text-foreground flex overflow-hidden">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/60 backdrop-blur-md z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -118,15 +118,15 @@ export default function DashboardLayout({
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
               const Icon = item.icon;
-              
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
                     "group flex items-center gap-4 px-4 py-3 rounded-2xl text-sm transition-all duration-300 relative overflow-hidden",
-                    isActive 
-                      ? "bg-primary text-white" 
+                    isActive
+                      ? "bg-primary text-white"
                       : "text-muted-foreground hover:bg-white/5 hover:text-white"
                   )}
                   onClick={() => setSidebarOpen(false)}
@@ -182,9 +182,9 @@ export default function DashboardLayout({
           >
             <Menu className="w-6 h-6" />
           </button>
-          
+
           <div className="flex items-center gap-4 pointer-events-auto">
-             {/* Dynamic Breadcrumbs or Status could go here */}
+            {/* Dynamic Breadcrumbs or Status could go here */}
           </div>
         </header>
 

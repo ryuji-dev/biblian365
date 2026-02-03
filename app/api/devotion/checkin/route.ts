@@ -12,37 +12,65 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { checkinDate, durationMinutes, memo, planId } = body as {
+    const { id, checkinDate, durationMinutes, memo, planId, plannedStartTime, plannedEndTime, startTime, endTime } = body as {
+      id?: string;
       checkinDate: string;
       durationMinutes?: number | null;
       memo?: string | null;
       planId?: string | null;
+      plannedStartTime?: string | null;
+      plannedEndTime?: string | null;
+      startTime?: string | null;
+      endTime?: string | null;
     };
 
     if (!checkinDate) {
       return NextResponse.json({ error: "Date is required" }, { status: 400 });
     }
 
-    // Upsert checkin
-    const { data, error } = await (supabase
-      .from("devotion_checkins") as any)
-      .upsert({
-        user_id: user.id,
-        checkin_date: checkinDate,
-        duration_minutes: durationMinutes ?? null,
-        memo: memo ?? null,
-        plan_id: planId ?? null,
-        created_by: user.id,
-        updated_by: user.id,
-      }, {
-        onConflict: 'user_id,checkin_date'
-      })
-      .select()
-      .single();
+    let result;
+    if (id) {
+      // Update existing
+      result = await (supabase
+        .from("devotion_checkins") as any)
+        .update({
+          duration_minutes: durationMinutes ?? null,
+          memo: memo ?? null,
+          plan_id: planId ?? null,
+          planned_start_time: plannedStartTime ?? null,
+          planned_end_time: plannedEndTime ?? null,
+          start_time: startTime ?? null,
+          end_time: endTime ?? null,
+          updated_by: user.id,
+        })
+        .eq("id", id)
+        .eq("user_id", user.id)
+        .select()
+        .single();
+    } else {
+      // Insert new
+      result = await (supabase
+        .from("devotion_checkins") as any)
+        .insert({
+          user_id: user.id,
+          checkin_date: checkinDate,
+          duration_minutes: durationMinutes ?? null,
+          memo: memo ?? null,
+          plan_id: planId ?? null,
+          planned_start_time: plannedStartTime ?? null,
+          planned_end_time: plannedEndTime ?? null,
+          start_time: startTime ?? null,
+          end_time: endTime ?? null,
+          created_by: user.id,
+          updated_by: user.id,
+        })
+        .select()
+        .single();
+    }
 
-    if (error) throw error;
+    if (result.error) throw result.error;
 
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data: result.data });
   } catch (error: any) {
     console.error("Checkin Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -59,17 +87,17 @@ export async function DELETE(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url);
-    const date = searchParams.get("date");
+    const id = searchParams.get("id");
 
-    if (!date) {
-      return NextResponse.json({ error: "Date is required" }, { status: 400 });
+    if (!id) {
+      return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
     const { error } = await (supabase
       .from("devotion_checkins") as any)
       .delete()
       .eq("user_id", user.id)
-      .eq("checkin_date", date);
+      .eq("id", id);
 
     if (error) throw error;
 

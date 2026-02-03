@@ -102,6 +102,10 @@ export interface Database {
           checkin_date: string;
           duration_minutes: number | null;
           memo: string | null;
+          planned_start_time: string | null;
+          start_time: string | null;
+          end_time: string | null;
+          planned_end_time: string | null;
           created_at: string;
           updated_at: string;
           created_by: string;
@@ -114,6 +118,10 @@ export interface Database {
           checkin_date: string;
           duration_minutes?: number | null;
           memo?: string | null;
+          planned_start_time?: string | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          planned_end_time?: string | null;
           created_at?: string;
           updated_at?: string;
           created_by: string;
@@ -126,6 +134,10 @@ export interface Database {
           checkin_date?: string;
           duration_minutes?: number | null;
           memo?: string | null;
+          planned_start_time?: string | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          planned_end_time?: string | null;
           created_at?: string;
           updated_at?: string;
           created_by?: string;
