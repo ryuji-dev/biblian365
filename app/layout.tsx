@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     description: "서울에스라교회 청년부를 위한 경건시간 관리 및 1년 성경통독 앱",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image-v2.png",
         width: 1200,
         height: 630,
         alt: "BIBLIAN365",
