@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient();
-      
+
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -68,7 +68,7 @@ export default function LoginPage() {
     <div className="min-h-screen w-full flex items-center justify-center bg-background p-4 relative overflow-hidden">
       <div className="w-full max-w-md z-10 animate-in fade-in zoom-in duration-500">
         <div className="bg-card border border-border rounded-[2rem] p-8 md:p-12 space-y-8 relative overflow-hidden shadow-2xl">
-          
+
           <div className="flex flex-col items-center space-y-4">
             <div className="w-20 h-20 bg-primary rounded-[1.5rem] flex items-center justify-center text-white text-2xl font-black">
               <BookOpenText className="w-10 h-10" />
@@ -87,7 +87,6 @@ export default function LoginPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -103,7 +102,6 @@ export default function LoginPage() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -119,8 +117,8 @@ export default function LoginPage() {
               </div>
             )}
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-12 transition-colors disabled:opacity-50"
               disabled={loading}
             >
@@ -136,7 +134,7 @@ export default function LoginPage() {
             </p>
           </div>
         </div>
-        
+
         {/* Bottom copyright or subtle link */}
         <p className="text-center mt-8 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/40">
           &copy; 2026 Biblian365. Grace and Truth.
