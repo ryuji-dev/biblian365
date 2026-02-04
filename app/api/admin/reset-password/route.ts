@@ -43,10 +43,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "해당 이메일을 사용하는 사용자를 찾을 수 없습니다." }, { status: 404 });
     }
 
-    // 2. Auth 비밀번호 업데이트 (1111로 초기화)
+    // 2. Auth 비밀번호 업데이트 (1111로 초기화 및 이메일 자동 컨펌)
     const { error: authError } = await adminClient.auth.admin.updateUserById(
       userData.id,
-      { password: '111111' }
+      {
+        password: '111111',
+        email_confirm: true
+      }
     );
 
     if (authError) {

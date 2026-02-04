@@ -14,6 +14,8 @@ interface AdminPageProps {
   searchParams: Promise<{ page?: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminPage({ searchParams }: AdminPageProps) {
   const { page } = await searchParams;
   const currentPage = parseInt(page || '1');
@@ -45,15 +47,35 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   // 전반적인 통계 데이터
   const adminClient = createAdminClient();
   const { count: userCount } = await adminClient.from("user_profiles").select("*", { count: 'exact', head: true });
-  const today = new Date().toISOString().split('T')[0];
-  const { data: todayCheckinData } = await supabase
+
+  // 오늘 날짜 계산 (KST 기준)
+  // getTimezoneOffset()을 고려하지 않고 항상 KST(+9)로 고정
+  const now = new Date();
+  const kstTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const today = kstTime.toISOString().split('T')[0];
+
+  // 오늘 경건시간 데이터 (adminClient 사용으로 RLS 우회)
+  const { data: checkinRows } = await adminClient
     .from("devotion_checkins")
     .select("user_id")
     .eq("checkin_date", today);
 
-  const todayCheckins = todayCheckinData
-    ? new Set((todayCheckinData as { user_id: string }[]).map(c => c.user_id)).size
-    : 0;
+  const todayCheckinData = (checkinRows || []) as { user_id: string }[];
+  const todayCheckins = new Set(todayCheckinData.map(c => c.user_id)).size;
+
+  // 참여한 인원들의 이름 정보 별도 로드 (Card용)
+  let todayCheckinNames = "";
+  if (todayCheckins > 0) {
+    const uniqueUserIds = Array.from(new Set(todayCheckinData.map(c => c.user_id)));
+    const { data: checkinProfiles } = await adminClient
+      .from("user_profiles")
+      .select("full_name")
+      .in("id", uniqueUserIds);
+
+    todayCheckinNames = ((checkinProfiles || []) as { full_name: string }[])
+      .map(p => p.full_name)
+      .join(", ");
+  }
 
   // 교우 목록 (페이지네이션 적용)
   const { data: usersData, count: totalUsers } = await adminClient
@@ -108,7 +130,14 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
-              <div className="text-3xl text-white tracking-tight font-normal">{todayCheckins || 0}명</div>
+              <div className="space-y-1">
+                <div className="text-3xl text-white tracking-tight font-normal">{todayCheckins}명</div>
+                {todayCheckins > 0 && (
+                  <div className="text-[10px] text-zinc-500 font-normal">
+                    {todayCheckinNames}
+                  </div>
+                )}
+              </div>
               <div className="w-12 h-12 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center transition-all duration-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] font-normal">
                 <History className="w-6 h-6" />
               </div>
@@ -166,32 +195,47 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   <thead>
                     <tr className="border-b border-white/5">
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest">이름</th>
+                      <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-center">오늘</th>
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest">이메일</th>
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-right">권한</th>
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-right">관리</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-normal">
-                    {memberList?.map((u) => (
-                      <tr key={u.id} className="group hover:bg-white/[0.02] transition-colors">
-                        <td className="py-5 text-white font-normal">{u.full_name}</td>
-                        <td className="py-5 text-zinc-400 font-normal">{u.email}</td>
-                        <td className="py-5 text-right">
-                          <span className={cn(
-                            "px-3 py-1 rounded-full text-[10px] font-normal tracking-widest uppercase border border-transparent",
-                            u.role === 'admin' ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/10" :
-                              u.role === 'leader' ? "bg-primary/20 text-primary border-primary/10" : "bg-zinc-800 text-zinc-500"
-                          )}>
-                            {u.role === 'admin' ? '목사님' : u.role === 'leader' ? '리더' : '교우'}
-                          </span>
-                        </td>
-                        <td className="py-5 text-right">
-                          {user.id !== u.id && (
-                            <DeleteUserButton userId={u.id} userName={u.full_name} />
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {memberList?.map((u) => {
+                      const isCheckedIn = todayCheckinData.some(c => c.user_id === u.id);
+                      return (
+                        <tr key={u.id} className="group hover:bg-white/[0.02] transition-colors">
+                          <td className="py-5 text-white font-normal">{u.full_name}</td>
+                          <td className="py-5 text-center">
+                            {isCheckedIn ? (
+                              <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500/20 text-green-500">
+                                <History className="w-3.5 h-3.5" />
+                              </div>
+                            ) : (
+                              <div className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-zinc-800/50 text-zinc-600">
+                                <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-5 text-zinc-400 font-normal">{u.email}</td>
+                          <td className="py-5 text-right">
+                            <span className={cn(
+                              "px-3 py-1 rounded-full text-[10px] font-normal tracking-widest uppercase border border-transparent",
+                              u.role === 'admin' ? "bg-indigo-500/20 text-indigo-400 border-indigo-500/10" :
+                                u.role === 'leader' ? "bg-primary/20 text-primary border-primary/10" : "bg-zinc-800 text-zinc-500"
+                            )}>
+                              {u.role === 'admin' ? '목사님' : u.role === 'leader' ? '리더' : '교우'}
+                            </span>
+                          </td>
+                          <td className="py-5 text-right">
+                            {user.id !== u.id && (
+                              <DeleteUserButton userId={u.id} userName={u.full_name} />
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

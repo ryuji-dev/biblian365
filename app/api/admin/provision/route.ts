@@ -30,17 +30,16 @@ export async function POST(req: NextRequest) {
 
     const adminClient = createAdminClient();
 
-    // 1. Auth 사용자 초대 (이메일 발송)
-    const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(
+    // 1. Auth 사용자 생성 (비밀번호 설정 및 이메일 자동 컨펌)
+    const { data: inviteData, error: inviteError } = await adminClient.auth.admin.createUser({
       email,
-      {
-        data: { full_name: fullName },
-        // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` // 필요 시 설정
-      }
-    );
+      password: temporaryPassword,
+      email_confirm: true,
+      user_metadata: { full_name: fullName }
+    });
 
     if (inviteError) {
-      return NextResponse.json({ error: `초대 메일 발송 실패: ${inviteError.message}` }, { status: 400 });
+      return NextResponse.json({ error: `계정 생성 실패: ${inviteError.message}` }, { status: 400 });
     }
 
     const authUser = inviteData.user;
@@ -60,7 +59,7 @@ export async function POST(req: NextRequest) {
       console.error('Profile creation error:', profileError);
     }
 
-    return NextResponse.json({ message: "성공적으로 초대 메일이 발송되었습니다." });
+    return NextResponse.json({ message: "성공적으로 계정이 생성되었습니다. 이제 해당 비밀번호로 로그인이 가능합니다." });
 
   } catch (error: any) {
     console.error('Provisioning error:', error);
