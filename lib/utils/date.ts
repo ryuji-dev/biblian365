@@ -14,7 +14,8 @@ export function formatDate(date: Date | string): string {
  */
 export function formatDateKorean(date: Date | string): string {
   const d = typeof date === 'string' ? parseISO(date) : date;
-  return format(d, 'yyyy년 M월 d일 (E)', { locale: ko });
+  const formatted = format(d, 'yyyy년 M월 d일 (E)', { locale: ko });
+  return formatted.replace('(일)', '(주일)');
 }
 
 /**
@@ -54,11 +55,11 @@ export function isToday(date: string): boolean {
 export function getDateRange(start: Date, end: Date): string[] {
   const dates: string[] = [];
   const current = new Date(start);
-  
+
   while (current <= end) {
     dates.push(formatDate(current));
     current.setDate(current.getDate() + 1);
   }
-  
+
   return dates;
 }

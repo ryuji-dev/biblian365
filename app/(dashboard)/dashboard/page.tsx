@@ -4,6 +4,7 @@ import { Book, BookOpen, Trophy, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { BIBLE_BOOKS, TOTAL_CHAPTERS } from '@/lib/constants/bible';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -38,24 +39,24 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .gte('checkin_date', firstDayOfMonth);
 
-  // 현재 연도 통독 진행률
+  // 현재 연도 통독 진행률 (user_bible_progress 테이블 기준)
   const currentYear = new Date().getFullYear();
-  const { data: currentPlan } = await supabase
-    .from('user_reading_plans')
-    .select('id, status')
-    .eq('user_id', user.id)
-    .eq('year', currentYear)
-    .single() as { data: { id: string; status: string } | null };
+  const { data: allProgress } = await supabase
+    .from('user_bible_progress')
+    .select('book_id, chapter, year')
+    .eq('user_id', user.id) as { data: { book_id: number; chapter: number; year: number }[] | null };
 
-  let readingProgress = 0;
-  if (currentPlan) {
-    const { count: completedCount } = await supabase
-      .from('user_reading_completions')
-      .select('*', { count: 'exact', head: true })
-      .eq('plan_id', currentPlan.id);
+  const currentYearProgress = allProgress?.filter(p => Number(p.year) === currentYear) || [];
+  const readingProgress = Math.round((currentYearProgress.length / TOTAL_CHAPTERS) * 100);
 
-    readingProgress = Math.round(((completedCount || 0) / 365) * 100);
-  }
+  // 누적 완독 횟수 계산
+  const yearGroups: Record<number, Set<string>> = {};
+  allProgress?.forEach(p => {
+    const y = Number(p.year);
+    if (!yearGroups[y]) yearGroups[y] = new Set();
+    yearGroups[y].add(`${p.book_id}-${p.chapter}`);
+  });
+  const cumulativeReads = Object.values(yearGroups).filter(set => set.size === TOTAL_CHAPTERS).length;
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
@@ -149,7 +150,7 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-end justify-between">
-              <div className="text-3xl text-white tracking-tight">{profile?.cumulative_readthrough_count || 0}회</div>
+              <div className="text-3xl text-white tracking-tight">{cumulativeReads}회</div>
               <div className="w-12 h-12 rounded-2xl bg-yellow-500/10 text-yellow-500 flex items-center justify-center transition-all duration-500 group-hover:bg-yellow-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(234,179,8,0.4)]">
                 <Trophy className="w-6 h-6" />
               </div>
