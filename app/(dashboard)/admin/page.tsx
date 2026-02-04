@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, ShieldAlert, History, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { AdminClient } from "@/components/admin/AdminClient";
@@ -42,7 +43,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   }
 
   // 전반적인 통계 데이터
-  const { count: userCount } = await supabase.from("user_profiles").select("*", { count: 'exact', head: true });
+  const adminClient = createAdminClient();
+  const { count: userCount } = await adminClient.from("user_profiles").select("*", { count: 'exact', head: true });
   const today = new Date().toISOString().split('T')[0];
   const { data: todayCheckinData } = await supabase
     .from("devotion_checkins")
@@ -54,7 +56,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
     : 0;
 
   // 교우 목록 (페이지네이션 적용)
-  const { data: usersData, count: totalUsers } = await supabase
+  const { data: usersData, count: totalUsers } = await adminClient
     .from("user_profiles")
     .select("id, email, full_name, role, created_at", { count: 'exact' })
     .order("created_at", { ascending: false })
