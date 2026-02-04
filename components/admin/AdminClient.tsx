@@ -17,7 +17,7 @@ export function AdminClient({ mode }: AdminClientProps) {
   // 스테이트
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
-  const [password, setPassword] = useState('1111');
+  const [password, setPassword] = useState('111111');
   const [role, setRole] = useState<'user' | 'leader' | 'admin'>('user');
 
   const handleAction = async (e: React.FormEvent) => {
@@ -149,7 +149,7 @@ export function AdminClient({ mode }: AdminClientProps) {
         ) : '계정 발급 및 통지'}
       </Button>
       <p className="text-center text-[11px] text-zinc-600 leading-relaxed px-4 font-normal">
-        * 임시 비밀번호는 기본적으로 '1111'로 세팅됩니다.<br />
+        * 임시 비밀번호는 기본적으로 '111111'로 세팅됩니다.<br />
         교우는 첫 로그인 시 비밀번호를 변경해야 합니다.
       </p>
     </form>

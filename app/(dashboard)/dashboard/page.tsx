@@ -7,9 +7,9 @@ import { cn } from '@/lib/utils';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  
+
   const { data: { user } } = await supabase.auth.getUser();
-  
+
   if (!user) {
     return <div>로그인이 필요합니다.</div>;
   }
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
       <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-primary/20 via-primary/5 to-transparent border border-white/5 p-6 md:p-10 mb-6">
         <div className="relative z-10 space-y-3">
           <h1 className="text-2xl md:text-4xl text-white tracking-tight leading-tight">
-            안녕하세요, <br className="md:hidden"/><span className="text-primary">{profile?.full_name || '사용자'}</span>님!
+            안녕하세요, <br className="md:hidden" /><span className="text-primary">{profile?.full_name || '사용자'}</span>님!
           </h1>
           <p className="text-zinc-400 text-base md:text-lg font-medium max-w-2xl">
             오늘도 하나님과 깊이 교제하며 성령 충만한 하루 보내시길 기도합니다.
@@ -93,8 +93,8 @@ export default async function DashboardPage() {
               </div>
               <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500",
-                todayCheckin 
-                  ? "bg-primary text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]" 
+                todayCheckin
+                  ? "bg-primary text-white shadow-[0_0_20px_rgba(124,58,237,0.3)]"
                   : "bg-zinc-900 text-zinc-700 group-hover:bg-primary group-hover:text-white group-hover:shadow-[0_0_20px_rgba(124,58,237,0.4)]"
               )}>
                 <Trophy className="w-6 h-6" />
@@ -178,7 +178,7 @@ export default async function DashboardPage() {
             <h3 className="text-3xl text-white tracking-wide">성경 통독표</h3>
             <p className="text-zinc-500 mt-3 text-lg font-medium">연간 계획을 따라 성경을 완독하세요</p>
           </div>
-          <Link href={`/reading/${currentYear}`} className="mt-8 relative z-10">
+          <Link href="/reading" className="mt-8 relative z-10">
             <Button variant="outline" className="w-full border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-16 text-lg transition-colors">
               통독표 보기
             </Button>

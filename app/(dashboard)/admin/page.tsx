@@ -1,7 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, ShieldAlert, History, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users, ShieldAlert, History, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { AdminClient } from "@/components/admin/AdminClient";
+import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
 import { cn } from "@/lib/utils";
 import { Database } from "@/types/database.types";
 import Link from 'next/link';
@@ -139,7 +140,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 비밀번호 초기화
               </CardTitle>
               <CardDescription className="text-zinc-500 font-normal">
-                비밀번호를 '1111'로 초기화합니다.
+                비밀번호를 '111111'로 초기화합니다.
               </CardDescription>
             </CardHeader>
             <CardContent className="p-8 pt-4">
@@ -165,6 +166,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest">이름</th>
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest">이메일</th>
                       <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-right">권한</th>
+                      <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-right">관리</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5 font-normal">
@@ -180,6 +182,11 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                           )}>
                             {u.role === 'admin' ? '목사님' : u.role === 'leader' ? '리더' : '교우'}
                           </span>
+                        </td>
+                        <td className="py-5 text-right">
+                          {user.id !== u.id && (
+                            <DeleteUserButton userId={u.id} userName={u.full_name} />
+                          )}
                         </td>
                       </tr>
                     ))}

@@ -30,34 +30,37 @@ export async function POST(req: NextRequest) {
 
     const adminClient = createAdminClient();
 
-    // 1. Auth 사용자 생성
-    const { data: authUser, error: authError } = await adminClient.auth.admin.createUser({
+    // 1. Auth 사용자 초대 (이메일 발송)
+    const { data: inviteData, error: inviteError } = await adminClient.auth.admin.inviteUserByEmail(
       email,
-      password: temporaryPassword || '1111',
-      email_confirm: true, // 발급 즉시 바로 로그인 가능하도록 설정
-      user_metadata: { full_name: fullName }
-    });
+      {
+        data: { full_name: fullName },
+        // redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback` // 필요 시 설정
+      }
+    );
 
-    if (authError) {
-      return NextResponse.json({ error: `계정 생성 실패: ${authError.message}` }, { status: 400 });
+    if (inviteError) {
+      return NextResponse.json({ error: `초대 메일 발송 실패: ${inviteError.message}` }, { status: 400 });
     }
 
-    // 2. User Profiles 테이블 업데이트 (트리거가 없을 경우를 대비해 명시적 수행)
+    const authUser = inviteData.user;
+
+    // 2. User Profiles 테이블 업데이트
     const { error: profileError } = await (adminClient
       .from('user_profiles') as any)
       .upsert({
-        id: authUser.user.id,
+        id: authUser.id,
         email,
         full_name: fullName,
         role: role as 'user' | 'leader' | 'admin',
-        first_login: true // 첫 로그인 후 비번 변경 유도용
+        first_login: true
       });
 
     if (profileError) {
       console.error('Profile creation error:', profileError);
     }
 
-    return NextResponse.json({ message: "성공적으로 계정이 발급되었습니다." });
+    return NextResponse.json({ message: "성공적으로 초대 메일이 발송되었습니다." });
 
   } catch (error: any) {
     console.error('Provisioning error:', error);

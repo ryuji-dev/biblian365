@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       .select('id')
       .eq('email', email)
       .single();
-    
+
     const userData = userDataRaw as { id: string } | null;
 
     if (findError || !userData) {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     // 2. Auth 비밀번호 업데이트 (1111로 초기화)
     const { error: authError } = await adminClient.auth.admin.updateUserById(
       userData.id,
-      { password: '1111' }
+      { password: '111111' }
     );
 
     if (authError) {
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
       console.error('Profile update error:', profileError);
     }
 
-    return NextResponse.json({ message: "비밀번호가 '1111'로 성공적으로 초기화되었습니다." });
+    return NextResponse.json({ message: "비밀번호가 '111111'로 성공적으로 초기화되었습니다." });
 
   } catch (error: any) {
     console.error('Reset password error:', error);

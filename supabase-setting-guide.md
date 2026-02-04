@@ -44,7 +44,7 @@
       <strong>아이디:</strong> {{ .Email }}
     </p>
     <p style="margin: 5px 0; font-weight: normal;">
-      <strong>임시 비밀번호:</strong> 1111
+      <strong>임시 비밀번호:</strong> 111111
     </p>
   </div>
   <p style="color: #666; font-size: 13px; font-weight: normal;">
@@ -78,14 +78,14 @@
     style="background: #fff7ed; padding: 20px; border-radius: 15px; margin: 25px 0; border: 1px solid #fed7aa;"
   >
     <p style="margin: 5px 0; font-weight: normal;">
-      <strong>임시 비밀번호:</strong> 1111
+      <strong>임시 비밀번호:</strong> 111111
     </p>
   </div>
   <p style="font-weight: normal; line-height: 1.6;">
     아래 버튼을 눌러 접속하신 후, 새로운 비밀번호로 변경하여 사용해 주세요.
   </p>
   <a
-    href="https://your-domain.com/login"
+    href="https://biblian365.vercel.app/login"
     style="display: inline-block; background: #ea580c; color: #fff; padding: 15px 30px; border-radius: 12px; text-decoration: none; margin-top: 15px; font-weight: normal;"
     >BIBLIAN365 접속하기</a
   >
