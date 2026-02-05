@@ -70,11 +70,11 @@ export default function LoginPage() {
         <div className="bg-card border border-border rounded-[2rem] p-8 md:p-12 space-y-8 relative overflow-hidden shadow-2xl">
 
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-20 h-20 bg-primary rounded-[1.5rem] flex items-center justify-center text-white text-2xl font-black">
+            <div className="w-20 h-20 bg-primary rounded-[1.5rem] flex items-center justify-center text-white text-2xl">
               <BookOpenText className="w-10 h-10" />
             </div>
             <div className="text-center space-y-1">
-              <h1 className="text-3xl font-black tracking-tight text-white font-brand">BIBLIAN 365</h1>
+              <h1 className="text-3xl tracking-tight text-white font-brand">BIBLIAN 365</h1>
               <p className="text-muted-foreground text-sm font-medium">경건과 성장의 기록을 시작하세요</p>
             </div>
           </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2 group">
-                <Label htmlFor="email" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1 group-focus-within:text-primary transition-colors">이메일 주소</Label>
+                <Label htmlFor="email" className="text-xs uppercase tracking-widest text-muted-foreground ml-1 group-focus-within:text-primary transition-colors">이메일 주소</Label>
                 <div className="relative">
                   <Input
                     id="email"
@@ -97,7 +97,7 @@ export default function LoginPage() {
               </div>
               <div className="space-y-2 group">
                 <div className="flex items-center justify-between ml-1">
-                  <Label htmlFor="password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">비밀번호</Label>
+                  <Label htmlFor="password" className="text-xs uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">비밀번호</Label>
                 </div>
                 <Input
                   id="password"
@@ -119,7 +119,8 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-12 transition-colors disabled:opacity-50"
+              size="xl"
+              className="w-full transition-all disabled:opacity-50"
               disabled={loading}
             >
               {loading ? (

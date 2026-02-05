@@ -62,7 +62,7 @@ export function CheckinCalendar({ checkinDates, onDateClick }: CheckinCalendarPr
           <div
             key={day}
             className={cn(
-              "text-center text-xs font-bold uppercase tracking-widest py-3",
+              "text-center text-xs uppercase tracking-widest py-3",
               day === "주일" ? "text-rose-400" : day === "토" ? "text-indigo-400" : "text-zinc-500"
             )}
           >

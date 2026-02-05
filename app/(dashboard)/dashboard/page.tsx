@@ -43,8 +43,9 @@ export default async function DashboardPage() {
   const currentYear = new Date().getFullYear();
   const { data: allProgress } = await supabase
     .from('user_bible_progress')
-    .select('book_id, chapter, year')
-    .eq('user_id', user.id) as { data: { book_id: number; chapter: number; year: number }[] | null };
+    .select('book_id, chapter, year, deleted_at')
+    .eq('user_id', user.id)
+    .is('deleted_at', null) as { data: { book_id: number; chapter: number; year: number; deleted_at: string | null }[] | null };
 
   const currentYearProgress = allProgress?.filter(p => Number(p.year) === currentYear) || [];
   const readingProgress = Math.round((currentYearProgress.length / TOTAL_CHAPTERS) * 100);
@@ -56,7 +57,9 @@ export default async function DashboardPage() {
     if (!yearGroups[y]) yearGroups[y] = new Set();
     yearGroups[y].add(`${p.book_id}-${p.chapter}`);
   });
-  const cumulativeReads = Object.values(yearGroups).filter(set => set.size === TOTAL_CHAPTERS).length;
+
+  const calculatedCumulativeReads = Object.values(yearGroups).filter(set => set.size === TOTAL_CHAPTERS).length;
+  const cumulativeReads = calculatedCumulativeReads + (profile?.cumulative_readthrough_count || 0);
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
@@ -167,7 +170,7 @@ export default async function DashboardPage() {
             <p className="text-zinc-500 mt-3 text-lg font-medium">진실한 만남의 시간을 기록으로 남겨보세요</p>
           </div>
           <Link href="/devotion" className="mt-8 relative z-10">
-            <Button className="w-full bg-primary hover:bg-primary/95 text-white rounded-2xl h-16 text-lg transition-colors">
+            <Button size="2xl" className="w-full transition-all">
               {todayCheckin ? '나의 기록 확인' : '오늘의 기록 남기기'}
             </Button>
           </Link>
@@ -180,7 +183,7 @@ export default async function DashboardPage() {
             <p className="text-zinc-500 mt-3 text-lg font-medium">연간 계획을 따라 성경을 완독하세요</p>
           </div>
           <Link href="/reading" className="mt-8 relative z-10">
-            <Button variant="outline" className="w-full border-white/10 bg-white/5 hover:bg-white/10 text-white rounded-2xl h-16 text-lg transition-colors">
+            <Button variant="glass" size="2xl" className="w-full transition-all">
               통독표 보기
             </Button>
           </Link>

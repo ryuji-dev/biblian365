@@ -38,7 +38,7 @@ export function ReadingClient({ mode, templateId, year, planId, items, completed
 
   const toggleComplete = async (date: string) => {
     const isCompleted = completedDates.includes(date);
-    
+
     try {
       const resp = await fetch('/api/reading/complete', {
         method: isCompleted ? 'DELETE' : 'POST',
@@ -74,8 +74,8 @@ export function ReadingClient({ mode, templateId, year, planId, items, completed
           const isTdy = item.date === todayStr;
 
           return (
-            <div 
-              key={item.id} 
+            <div
+              key={item.id}
               className={cn(
                 "p-4 rounded-xl border flex items-center justify-between transition-all",
                 isDone ? "bg-gray-50 border-gray-100 opacity-70" : "bg-white border-gray-200",
@@ -83,7 +83,7 @@ export function ReadingClient({ mode, templateId, year, planId, items, completed
               )}
             >
               <div className="flex items-center gap-4">
-                <button 
+                <button
                   onClick={() => toggleComplete(item.date)}
                   className={cn(
                     "w-8 h-8 rounded-full flex items-center justify-center transition-colors",
@@ -94,13 +94,13 @@ export function ReadingClient({ mode, templateId, year, planId, items, completed
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-gray-400">DAY {item.day_number}</span>
+                    <span className="text-xs text-gray-400">DAY {item.day_number}</span>
                     <span className="text-sm font-medium text-gray-500">
                       {format(new Date(item.date), 'M월 d일 (E)', { locale: ko })}
                     </span>
-                    {isTdy && <span className="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">Today</span>}
+                    {isTdy && <span className="bg-primary text-white text-[10px] px-1.5 py-0.5 rounded uppercase">Today</span>}
                   </div>
-                  <h4 className={cn("text-lg font-bold mt-1", isDone && "line-through text-gray-400")}>
+                  <h4 className={cn("text-lg mt-1", isDone && "line-through text-gray-400")}>
                     {item.passages}
                   </h4>
                   {item.notes && <p className="text-xs text-gray-400 mt-1">{item.notes}</p>}
@@ -111,9 +111,9 @@ export function ReadingClient({ mode, templateId, year, planId, items, completed
         })}
       </div>
 
-      <Button 
-        variant="ghost" 
-        className="w-full text-gray-400" 
+      <Button
+        variant="ghost"
+        className="w-full text-gray-400"
         onClick={() => setShowAll(!showAll)}
       >
         {showAll ? (

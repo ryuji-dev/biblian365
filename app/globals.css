@@ -45,6 +45,7 @@
   * {
     @apply border-border;
     font-family: 'BMJUA', sans-serif !important;
+    font-weight: normal !important;
   }
 
   body {

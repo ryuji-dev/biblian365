@@ -146,7 +146,7 @@ export function CheckinModal({
 
     return (
       <div className="space-y-2">
-        <label className="text-xs font-bold text-zinc-500 uppercase ml-1">{label}</label>
+        <label className="text-xs text-zinc-500 uppercase ml-1">{label}</label>
         <div className="flex gap-2">
           <select
             value={h}
@@ -188,7 +188,7 @@ export function CheckinModal({
           {/* 기존 기록 목록 */}
           {initialData.length > 0 && (
             <div className="space-y-4">
-              <h4 className="text-sm font-bold text-zinc-500 uppercase tracking-wider ml-1">저장된 기록</h4>
+              <h4 className="text-sm text-zinc-500 uppercase tracking-wider ml-1">저장된 기록</h4>
               <div className="space-y-3">
                 {initialData.map((record: any) => (
                   <div key={record.id} className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group hover:border-primary/40 transition-all">
@@ -197,7 +197,7 @@ export function CheckinModal({
                         {(record.startTime && record.startTime !== '00:00') || (record.endTime && record.endTime !== '00:00')
                           ? `${formatTimeShort(record.startTime)} ~ ${formatTimeShort(record.endTime)}`
                           : `${formatTimeShort(record.plannedStartTime)} ~ ${formatTimeShort(record.plannedEndTime)} (계획)`}
-                        <span className="ml-2 text-primary font-bold">{record.durationMinutes || 0}분</span>
+                        <span className="ml-2 text-primary">{record.durationMinutes || 0}분</span>
                       </div>
                       {record.memo && <div className="text-zinc-500 text-sm line-clamp-1">{record.memo}</div>}
                     </div>
@@ -224,16 +224,16 @@ export function CheckinModal({
             <form onSubmit={handleSubmit} className="space-y-8 animate-in slide-in-from-top-4 duration-300">
               <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4 bg-white/5 p-5 rounded-[1.5rem] border border-white/5">
-                  <div className="col-span-2 text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">📅 계획된 시간</div>
+                  <div className="col-span-2 text-xs text-zinc-500 uppercase tracking-widest mb-1">📅 계획된 시간</div>
                   <TimeSelect label="계획 시작" value={plannedStartTime} onChange={setPlannedStartTime} />
                   <TimeSelect label="계획 종료" value={plannedEndTime} onChange={setPlannedEndTime} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 bg-primary/5 p-5 rounded-[1.5rem] border border-primary/10">
                   <div className="col-span-2 flex justify-between items-center mb-1">
-                    <span className="text-xs font-bold text-primary uppercase tracking-widest">✨ 실제 경건 시간</span>
+                    <span className="text-xs text-primary uppercase tracking-widest">✨ 실제 경건 시간</span>
                     <div className="bg-primary/20 px-3 py-1 rounded-full">
-                      <span className="text-primary font-bold text-sm">{duration || '0'}분 수행</span>
+                      <span className="text-primary text-sm">{duration || '0'}분</span>
                     </div>
                   </div>
                   <TimeSelect label="실제 시작" value={startTime} onChange={(v) => { setStartTime(v); calculateDuration(v, endTime); }} />
@@ -242,7 +242,7 @@ export function CheckinModal({
               </div>
 
               <div className="space-y-3">
-                <Label htmlFor="memo" className="text-sm font-bold text-zinc-400 uppercase tracking-wider ml-1">메모</Label>
+                <Label htmlFor="memo" className="text-sm text-zinc-400 uppercase tracking-wider ml-1">메모</Label>
                 <Textarea
                   id="memo"
                   placeholder="말씀 묵상 내용이나 기도 제목 등"

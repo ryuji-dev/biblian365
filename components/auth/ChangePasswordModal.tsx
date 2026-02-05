@@ -92,7 +92,7 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
             <DialogContent className="sm:max-w-[480px] bg-[#0c0c0e] border border-white/20 p-0 overflow-hidden rounded-[2.5rem] shadow-[0_0_50px_rgba(0,0,0,0.6)]">
                 <div className="p-8 space-y-8 animate-in fade-in duration-500">
                     <DialogHeader className="space-y-3">
-                        <DialogTitle className="text-3xl text-white font-bold tracking-tight flex items-center gap-3">
+                        <DialogTitle className="text-3xl text-white tracking-tight flex items-center gap-3">
                             <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
                                 <ShieldCheck className="w-6 h-6 text-green-500" />
                             </div>
@@ -108,7 +108,7 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
                             <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center border border-green-500/30">
                                 <CheckCircle2 className="w-10 h-10 text-green-500" />
                             </div>
-                            <p className="text-white font-bold text-xl text-center">
+                            <p className="text-white text-xl text-center">
                                 비밀번호가 변경되었습니다. <br />
                                 <span className="text-sm font-medium text-zinc-400">잠시 후 로그인 페이지로 이동합니다.</span>
                             </p>
@@ -117,7 +117,7 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="modal-current" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">현재 비밀번호</Label>
+                                    <Label htmlFor="modal-current" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">현재 비밀번호</Label>
                                     <Input
                                         id="modal-current"
                                         type="password"
@@ -129,7 +129,7 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="modal-new" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호</Label>
+                                    <Label htmlFor="modal-new" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호</Label>
                                     <Input
                                         id="modal-new"
                                         type="password"
@@ -141,7 +141,7 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label htmlFor="modal-confirm" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호 확인</Label>
+                                    <Label htmlFor="modal-confirm" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호 확인</Label>
                                     <Input
                                         id="modal-confirm"
                                         type="password"
@@ -163,7 +163,9 @@ export function ChangePasswordModal({ trigger }: { trigger: React.ReactNode }) {
                             <DialogFooter className="pt-4">
                                 <Button
                                     type="submit"
-                                    className="w-full h-14 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-lg transition-all shadow-lg shadow-green-500/30"
+                                    size="xl"
+                                    variant="success"
+                                    className="w-full transition-all"
                                     disabled={loading}
                                 >
                                     {loading ? (

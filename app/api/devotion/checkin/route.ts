@@ -28,6 +28,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Date is required" }, { status: 400 });
     }
 
+    // Check for midnight span
+    const isSpanningMidnight = startTime && endTime && (startTime > endTime);
+
     let result;
     if (id) {
       // Update existing
@@ -40,7 +43,7 @@ export async function POST(req: NextRequest) {
           planned_start_time: plannedStartTime ?? null,
           planned_end_time: plannedEndTime ?? null,
           start_time: startTime ?? null,
-          end_time: endTime ?? null,
+          end_time: isSpanningMidnight ? "24:00" : (endTime ?? null),
           updated_by: user.id,
         })
         .eq("id", id)
@@ -60,7 +63,7 @@ export async function POST(req: NextRequest) {
           planned_start_time: plannedStartTime ?? null,
           planned_end_time: plannedEndTime ?? null,
           start_time: startTime ?? null,
-          end_time: endTime ?? null,
+          end_time: isSpanningMidnight ? "24:00" : (endTime ?? null),
           created_by: user.id,
           updated_by: user.id,
         })
@@ -69,6 +72,57 @@ export async function POST(req: NextRequest) {
     }
 
     if (result.error) throw result.error;
+
+    // Handle split record for midnight span
+    const mainRecord = result.data;
+    if (isSpanningMidnight) {
+      // Calculate next day date
+      const nextDate = new Date(checkinDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+      const nextDateStr = nextDate.toISOString().split('T')[0];
+
+      // Upsert the "tomorrow" part
+      // We search for an existing child record by parent_id
+      const { data: existingChild } = await (supabase
+        .from("devotion_checkins") as any)
+        .select("id")
+        .eq("parent_id", mainRecord.id)
+        .maybeSingle();
+
+      if (existingChild) {
+        await (supabase
+          .from("devotion_checkins") as any)
+          .update({
+            checkin_date: nextDateStr,
+            start_time: "00:00",
+            end_time: endTime,
+            duration_minutes: durationMinutes, // Note: total duration? Or split? User wants to see it on both days.
+            memo: memo,
+            updated_by: user.id
+          })
+          .eq("id", existingChild.id);
+      } else {
+        await (supabase
+          .from("devotion_checkins") as any)
+          .insert({
+            user_id: user.id,
+            checkin_date: nextDateStr,
+            start_time: "00:00",
+            end_time: endTime,
+            duration_minutes: durationMinutes,
+            memo: memo,
+            parent_id: mainRecord.id,
+            created_by: user.id,
+            updated_by: user.id
+          });
+      }
+    } else {
+      // If NOT spanning anymore, delete any orphaned child record
+      await (supabase
+        .from("devotion_checkins") as any)
+        .delete()
+        .eq("parent_id", mainRecord.id);
+    }
 
     return NextResponse.json({ success: true, data: result.data });
   } catch (error: any) {
@@ -93,6 +147,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
+    // Delete the record. CASCADE should handle child records if configured.
     const { error } = await (supabase
       .from("devotion_checkins") as any)
       .delete()

@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BIBLE_BOOKS, TOTAL_CHAPTERS, BibleBook } from '@/lib/constants/bible';
-import { BookOpen, CheckCircle2, Flame, Target, ChevronDown, ChevronUp, Book, Trophy } from 'lucide-react';
+import { BookOpen, CheckCircle2, Flame, Target, ChevronDown, ChevronUp, Book, Trophy, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BibleProgress {
@@ -12,18 +12,22 @@ interface BibleProgress {
     chapter: number;
     year: number;
     completed_at: string;
+    deleted_at?: string | null;
 }
 
 interface BibleReadingTableProps {
     progress: BibleProgress[];
+    cumulativeReadCount?: number;
 }
 
-export function BibleReadingTable({ progress }: BibleReadingTableProps) {
+export function BibleReadingTable({ progress, cumulativeReadCount: initialManualCount = 0 }: BibleReadingTableProps) {
     const router = useRouter();
-    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
     const [expandedBookId, setExpandedBookId] = useState<number | null>(null);
     const [loading, setLoading] = useState<Record<string, boolean>>({});
-    const [optimisticProgress, setOptimisticProgress] = useState(progress);
+    const [optimisticProgress, setOptimisticProgress] = useState<BibleProgress[]>(progress);
+    const [manualCount, setManualCount] = useState(initialManualCount);
+    const [isIncrementing, setIsIncrementing] = useState(false);
 
     // Sync optimistic state with props when props change
     useEffect(() => {
@@ -31,54 +35,111 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
     }, [progress]);
 
     // Calculations
-    const currentYearProgress = optimisticProgress.filter(p => Number(p.year) === Number(selectedYear));
+    const currentYearProgress = optimisticProgress.filter(p =>
+        Number(p.year) === Number(selectedYear) && !p.deleted_at
+    );
     const completedCount = currentYearProgress.length;
     const progressPercent = Math.round((completedCount / TOTAL_CHAPTERS) * 100);
-
-    const todayString = new Date().toISOString().split('T')[0];
-    const todayCount = optimisticProgress.filter(p => p.completed_at?.startsWith(todayString)).length;
 
     // Calculate total reads: count how many years have all chapters completed
     const totalReads = useMemo(() => {
         const yearGroups: Record<number, Set<string>> = {};
         optimisticProgress.forEach(p => {
-            const y = Number(p.year);
-            if (!yearGroups[y]) yearGroups[y] = new Set();
-            yearGroups[y].add(`${p.book_id}-${p.chapter}`);
+            if (!p.deleted_at) {
+                const y = Number(p.year);
+                if (!yearGroups[y]) yearGroups[y] = new Set();
+                yearGroups[y].add(`${p.book_id}-${p.chapter}`);
+            }
         });
-        return Object.values(yearGroups).filter(set => set.size === TOTAL_CHAPTERS).length;
-    }, [optimisticProgress]);
+        const calculated = Object.values(yearGroups).filter(set => set.size === TOTAL_CHAPTERS).length;
+        return calculated + manualCount;
+    }, [optimisticProgress, manualCount]);
 
     const bookProgress = useMemo(() => {
-        const map: Record<number, number[]> = {};
-        currentYearProgress.forEach(p => {
-            const bid = Number(p.book_id);
-            if (!map[bid]) map[bid] = [];
-            map[bid].push(Number(p.chapter));
+        const progression: Record<number, number[]> = {};
+        optimisticProgress.forEach(p => {
+            if (Number(p.year) === Number(selectedYear) && !p.deleted_at) {
+                const bookId = Number(p.book_id);
+                if (!progression[bookId]) progression[bookId] = [];
+                progression[bookId].push(Number(p.chapter));
+            }
         });
-        return map;
-    }, [currentYearProgress]);
+        return progression;
+    }, [optimisticProgress, selectedYear]);
+
+    // 오늘 읽은 장 수 계산 (deleted_at 제외)
+    const todayCount = useMemo(() => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        return optimisticProgress.filter(p =>
+            p.completed_at.startsWith(todayStr) &&
+            !p.deleted_at
+        ).length;
+    }, [optimisticProgress]);
+
+    const incrementRead = async () => {
+        if (isIncrementing) return;
+
+        setIsIncrementing(true);
+        // Optimistic update
+        setManualCount(prev => prev + 1);
+
+        try {
+            const resp = await fetch('/api/user/profile/increment-reads', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ increment: 1 }),
+            });
+
+            if (!resp.ok) {
+                throw new Error('Failed to update');
+            }
+            router.refresh();
+        } catch (err) {
+            console.error(err);
+            setManualCount(prev => prev - 1);
+            alert('기록 저장 중 오류가 발생했습니다.');
+        } finally {
+            setIsIncrementing(false);
+        }
+    };
 
     const toggleChapter = async (bookId: number, chapter: number) => {
         const key = `${bookId}-${chapter}`;
         if (loading[key]) return;
 
         // Optimistic Update
-        const isCurrentlyDone = bookProgress[bookId]?.includes(chapter);
+        const isCurrentlyDone = bookProgress[bookId]?.includes(chapter); // Checks if it's done AND not deleted
         const prevProgress = [...optimisticProgress];
 
-        if (isCurrentlyDone) {
-            setOptimisticProgress(prev => prev.filter(p =>
-                !(Number(p.book_id) === bookId && Number(p.chapter) === chapter && Number(p.year) === Number(selectedYear))
-            ));
-        } else {
-            setOptimisticProgress(prev => [...prev, {
-                book_id: bookId,
-                chapter: chapter,
-                year: Number(selectedYear),
-                completed_at: new Date().toISOString()
-            }]);
-        }
+        setOptimisticProgress(prev => {
+            const existingEntryIndex = prev.findIndex(p =>
+                Number(p.book_id) === bookId &&
+                Number(p.chapter) === chapter &&
+                Number(p.year) === Number(selectedYear)
+            );
+
+            if (existingEntryIndex !== -1) {
+                // If an entry exists, toggle its deleted_at status
+                const updatedProgress = [...prev];
+                const existingEntry = updatedProgress[existingEntryIndex];
+                updatedProgress[existingEntryIndex] = {
+                    ...existingEntry,
+                    deleted_at: isCurrentlyDone ? new Date().toISOString() : null,
+                    // Preserve original completed_at when restoring
+                    completed_at: existingEntry.completed_at
+                };
+                return updatedProgress;
+            } else {
+                // If no entry exists, add a new one (marked as not deleted)
+                return [...prev, {
+                    book_id: bookId,
+                    chapter: chapter,
+                    year: Number(selectedYear),
+                    completed_at: new Date().toISOString(),
+                    deleted_at: null
+                }];
+            }
+        });
 
         setLoading(prev => ({ ...prev, [key]: true }));
         try {
@@ -104,31 +165,60 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
         const key = `all-${bookId}`;
         if (loading[key]) return;
 
-        const prevProgress = [...optimisticProgress];
         const book = BIBLE_BOOKS.find(b => b.id === bookId);
         if (!book) return;
 
-        // Optimistic: Mark all chapters as done for this year
-        const newEntries = Array.from({ length: book.chapters }, (_, i) => ({
-            book_id: bookId,
-            chapter: i + 1,
-            year: Number(selectedYear),
-            completed_at: new Date().toISOString()
-        }));
+        const completedChapters = bookProgress[bookId] || [];
+        const isCurrentlyAllDone = completedChapters.length === book.chapters;
+        const prevProgress = [...optimisticProgress];
 
-        setOptimisticProgress(prev => {
-            const otherProgress = prev.filter(p =>
-                !(Number(p.book_id) === bookId && Number(p.year) === Number(selectedYear))
-            );
-            return [...otherProgress, ...newEntries];
-        });
+        if (isCurrentlyAllDone) {
+            // Uncheck all (Soft Delete)
+            setOptimisticProgress(prev => prev.map(p =>
+                (Number(p.book_id) === bookId && Number(p.year) === Number(selectedYear))
+                    ? { ...p, deleted_at: new Date().toISOString() }
+                    : p
+            ));
+        } else {
+            // Check all (Restore or Create)
+            setOptimisticProgress(prev => {
+                const restOfProgress = prev.filter(p =>
+                    !(Number(p.book_id) === bookId && Number(p.year) === Number(selectedYear))
+                );
+                const bookEntries = Array.from({ length: book.chapters }, (_, i) => ({
+                    book_id: bookId,
+                    chapter: i + 1,
+                    year: Number(selectedYear),
+                    completed_at: new Date().toISOString(),
+                    deleted_at: null
+                }));
+                // We actually want to keep old completed_at if possible, 
+                // but for optimistic UI simplicity, we'll just check if it was already there (even deleted)
+                const restoredEntries = prev
+                    .filter(p => Number(p.book_id) === bookId && Number(p.year) === Number(selectedYear))
+                    .map(p => ({ ...p, deleted_at: null }));
+
+                // If we have existing ones, use them (restores old dates), otherwise use new ones
+                const finalEntries = bookEntries.map(be => {
+                    const match = restoredEntries.find(re => Number(re.chapter) === be.chapter);
+                    return match || be;
+                });
+
+                return [...restOfProgress, ...finalEntries];
+            });
+        }
 
         setLoading(prev => ({ ...prev, [key]: true }));
         try {
             const res = await fetch('/api/bible-reading/toggle', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ bookId, all: true, year: Number(selectedYear) }),
+                body: JSON.stringify({
+                    bookId,
+                    all: true,
+                    year: Number(selectedYear),
+                    remove: isCurrentlyAllDone
+                }),
             });
             if (!res.ok) {
                 setOptimisticProgress(prevProgress); // Rollback
@@ -197,26 +287,25 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
                                         <Book className="w-5 h-5" />
                                     </div>
                                     <div className="text-left">
-                                        <h3 className="font-bold text-white">{book.name}</h3>
+                                        <h3 className="text-white">{book.name}</h3>
                                         <p className="text-xs text-zinc-500">
                                             {completedChapters.length} / {book.chapters} 장 읽음
                                         </p>
                                     </div>
                                 </button>
-                                <div className="flex items-center gap-2">
-                                    {!isCompleted && (
-                                        <button
-                                            disabled={isBulkLoading}
-                                            onClick={() => toggleAllChapters(book.id)}
-                                            className={cn(
-                                                "p-2 rounded-lg transition-colors hover:bg-white/5",
-                                                isBulkLoading ? "animate-pulse" : `text-zinc-500 ${theme === 'indigo' ? 'hover:text-indigo-400' : 'hover:text-rose-400'}`
-                                            )}
-                                            title="한 번에 다 읽음"
-                                        >
-                                            <CheckCircle2 className="w-5 h-5" />
-                                        </button>
-                                    )}
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        disabled={isBulkLoading}
+                                        onClick={() => toggleAllChapters(book.id)}
+                                        className={cn(
+                                            "p-2 rounded-lg transition-colors hover:bg-white/5",
+                                            isBulkLoading ? "animate-pulse" : `text-zinc-500 ${theme === 'indigo' ? 'hover:text-indigo-400' : 'hover:text-rose-400'}`,
+                                            isCompleted && "text-primary hover:text-primary"
+                                        )}
+                                        title={isCompleted ? "전체 해제" : "전체 선택"}
+                                    >
+                                        {isCompleted ? <RotateCcw className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
+                                    </button>
                                     <button
                                         onClick={() => setExpandedBookId(isExpanded ? null : book.id)}
                                         className="p-2 text-zinc-500"
@@ -267,10 +356,10 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
                     {[2026, 2027, 2028].map(y => (
                         <button
                             key={y}
-                            onClick={() => setSelectedYear(y)}
+                            onClick={() => setSelectedYear(y.toString())}
                             className={cn(
-                                "px-6 py-2 rounded-xl text-sm font-bold transition-all",
-                                Number(selectedYear) === y
+                                "px-6 py-2 rounded-xl text-sm transition-all",
+                                selectedYear === y.toString()
                                     ? "bg-primary text-white shadow-lg"
                                     : "text-zinc-500 hover:text-white"
                             )}
@@ -325,10 +414,19 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
 
                 <Card className="glass-dark border-white/5 shadow-none overflow-hidden group hover:border-yellow-500/30 transition-all duration-500 rounded-[2rem]">
                     <CardHeader className="pb-2">
-                        <CardTitle className="flex items-center gap-2 text-sm text-zinc-300 uppercase tracking-tight mb-2">
-                            <Trophy className="w-4 h-4 text-yellow-500" />
-                            누적 완독
-                        </CardTitle>
+                        <div className="text-zinc-500 text-sm tracking-tight mb-2 uppercase flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Trophy className="w-4 h-4 text-yellow-500" />
+                                누적 완독
+                            </div>
+                            <button
+                                onClick={incrementRead}
+                                disabled={isIncrementing}
+                                className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md hover:bg-primary/20 hover:border-primary/30 transition-all text-zinc-400 hover:text-primary active:scale-95"
+                            >
+                                {isIncrementing ? "보내는 중..." : "+ 1독 추가 (과거 기록)"}
+                            </button>
+                        </div>
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-end justify-between">
@@ -344,7 +442,7 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
             {/* Bible Sections */}
             <div className="space-y-12">
                 <section>
-                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <h2 className="text-xl text-white mb-6 flex items-center gap-2">
                         <div className="w-2 h-6 bg-indigo-500 rounded-full" />
                         구약 성경 (Old Testament)
                     </h2>
@@ -352,7 +450,7 @@ export function BibleReadingTable({ progress }: BibleReadingTableProps) {
                 </section>
 
                 <section>
-                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    <h2 className="text-xl text-white mb-6 flex items-center gap-2">
                         <div className="w-2 h-6 bg-rose-500 rounded-full" />
                         신약 성경 (New Testament)
                     </h2>

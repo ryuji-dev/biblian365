@@ -100,10 +100,10 @@ export default function DashboardLayout({
           {/* Logo */}
           <div className="flex items-center justify-between h-20 px-6">
             <Link href="/dashboard" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
-              <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white font-black shadow-sm">
-                <BookOpenText className="w-7 h-7" />
+              <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-sm">
+                <BookOpenText className="w-8 h-8" />
               </div>
-              <span className="font-black text-xl tracking-tighter text-white font-brand">BIBLIAN 365</span>
+              <span className="text-2xl tracking-tighter text-white font-brand">BIBLIAN 365</span>
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}

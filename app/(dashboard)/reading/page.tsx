@@ -11,9 +11,17 @@ export default async function BibleReadingPage() {
     // Get user's bible reading progress
     const { data: progress } = await (supabase
         .from("user_bible_progress") as any)
-        .select("book_id, chapter, year, completed_at")
+        .select("book_id, chapter, year, completed_at, deleted_at")
         .eq("user_id", user.id)
+        .is("deleted_at", null)
         .order("completed_at", { ascending: false });
+
+    // Get cumulative read count from profile
+    const { data: profile } = await (supabase
+        .from("user_profiles") as any)
+        .select("cumulative_readthrough_count")
+        .eq("id", user.id)
+        .single();
 
     return (
         <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-1000">
@@ -35,7 +43,10 @@ export default async function BibleReadingPage() {
                 <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[120%] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
             </div>
 
-            <BibleReadingTable progress={progress || []} />
+            <BibleReadingTable
+                progress={progress || []}
+                cumulativeReadCount={profile?.cumulative_readthrough_count || 0}
+            />
         </div>
     );
 }

@@ -35,7 +35,7 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
 
     return (
       <div className="p-6 max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">{parsedYear}년 성경 통독 플랜</h1>
+        <h1 className="text-2xl mb-6">{parsedYear}년 성경 통독 플랜</h1>
         <Card>
           <CardHeader>
             <CardTitle>통독 플랜이 없습니다</CardTitle>
@@ -47,7 +47,7 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
                 {templates.map(t => (
                   <div key={t.id} className="p-4 border rounded-lg flex justify-between items-center">
                     <div>
-                      <h3 className="font-bold">{t.title}</h3>
+                      <h3>{t.title}</h3>
                       <p className="text-sm text-gray-500">{t.description}</p>
                     </div>
                     <ReadingClient mode="create" templateId={t.id} year={parsedYear} />
@@ -83,7 +83,7 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
     <div className="p-6 max-w-5xl mx-auto">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl flex items-center gap-2">
             <BookOpen className="w-6 h-6 text-primary" />
             {userPlan.reading_plan_templates.title}
           </h1>
@@ -92,14 +92,14 @@ export default async function ReadingPage({ params }: ReadingPageProps) {
         <div className="flex items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
           <div className="text-right">
             <p className="text-xs text-gray-500 font-medium">진행률</p>
-            <p className="text-2xl font-bold text-primary">{progress}%</p>
+            <p className="text-2xl text-primary">{progress}%</p>
           </div>
           <div className="w-12 h-12 rounded-full border-4 border-primary/10 flex items-center justify-center relative">
             <div
               className="absolute inset-0 rounded-full border-4 border-primary"
               style={{ clipPath: `inset(${100 - progress}% 0 0 0)` }}
             />
-            <span className="text-[10px] font-bold">{completedDates.length}일</span>
+            <span className="text-[10px]">{completedDates.length}일</span>
           </div>
         </div>
       </div>

@@ -24,20 +24,20 @@ export default async function ProfilePage() {
     <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
       {/* Header Section - Inspired by User's Request */}
       <div className="flex flex-col md:flex-row items-center gap-6 px-4">
-        <div className="w-20 h-20 rounded-[1.5rem] bg-indigo-500/10 border border-white/5 flex items-center justify-center text-indigo-500 font-bold text-3xl shadow-xl">
+        <div className="w-20 h-20 rounded-[1.5rem] bg-indigo-500/10 border border-white/5 flex items-center justify-center text-indigo-500 text-3xl shadow-xl">
           {roleInitial}
         </div>
 
         <div className="text-center md:text-left space-y-1">
           <div className="flex flex-col md:flex-row md:items-center md:gap-3">
-            <h1 className="text-2xl md:text-3xl text-white font-bold tracking-tight">
+            <h1 className="text-2xl md:text-3xl text-white tracking-tight">
               {profile?.full_name || '사용자'}
             </h1>
             <span className="text-zinc-500 text-lg md:text-xl font-medium tracking-tight">
               {profile?.email}
             </span>
           </div>
-          <div className="text-zinc-500 text-sm font-bold tracking-widest uppercase opacity-70">
+          <div className="text-zinc-500 text-sm tracking-widest uppercase opacity-70">
             {roleLabel}
           </div>
         </div>
@@ -45,7 +45,7 @@ export default async function ProfilePage() {
 
       {/* Settings / Actions */}
       <div className="space-y-6">
-        <h2 className="text-xl text-white font-bold px-4 flex items-center gap-2">
+        <h2 className="text-xl text-white px-4 flex items-center gap-2">
           <Settings className="w-5 h-5 text-zinc-500" />
           계정 설정
         </h2>
@@ -59,7 +59,7 @@ export default async function ProfilePage() {
                     <Key className="w-5 h-5 text-zinc-400 group-hover:text-green-500 transition-colors duration-300" />
                   </div>
                   <div className="text-left">
-                    <div className="text-white font-bold group-hover:text-green-500 transition-colors duration-300">비밀번호 변경</div>
+                    <div className="text-white group-hover:text-green-500 transition-colors duration-300">비밀번호 변경</div>
                     <div className="text-xs text-zinc-500">계정 보안을 위해 정기적으로 변경하세요.</div>
                   </div>
                 </div>
@@ -74,7 +74,7 @@ export default async function ProfilePage() {
                   <LogOut className="w-5 h-5 text-zinc-400 group-hover:text-rose-500 transition-colors duration-300" />
                 </div>
                 <div className="text-left">
-                  <div className="text-white font-bold group-hover:text-rose-500 transition-colors duration-300">로그아웃</div>
+                  <div className="text-white group-hover:text-rose-500 transition-colors duration-300">로그아웃</div>
                   <div className="text-xs text-zinc-500">Biblian 365 세션을 종료합니다.</div>
                 </div>
               </div>

@@ -107,7 +107,7 @@ export default function ChangePasswordPage() {
               <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center border border-green-500/20">
                 <ShieldCheck className="w-6 h-6 text-green-500" />
               </div>
-              <h1 className="text-3xl text-white font-bold tracking-tight">
+              <h1 className="text-3xl text-white tracking-tight">
                 비밀번호 변경
               </h1>
             </div>
@@ -124,7 +124,7 @@ export default function ChangePasswordPage() {
                 <CheckCircle2 className="w-10 h-10 text-green-500" />
               </div>
               <div className="text-center">
-                <p className="text-white font-bold text-xl mb-1">
+                <p className="text-white text-xl mb-1">
                   비밀번호가 변경되었습니다.
                 </p>
                 <p className="text-sm font-medium text-zinc-400">
@@ -137,7 +137,7 @@ export default function ChangePasswordPage() {
               <div className="space-y-4">
                 {!isFirstLogin && (
                   <div className="space-y-2">
-                    <Label htmlFor="current" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">현재 비밀번호</Label>
+                    <Label htmlFor="current" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">현재 비밀번호</Label>
                     <Input
                       id="current"
                       type="password"
@@ -151,7 +151,7 @@ export default function ChangePasswordPage() {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="new" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호</Label>
+                  <Label htmlFor="new" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호</Label>
                   <Input
                     id="new"
                     type="password"
@@ -164,7 +164,7 @@ export default function ChangePasswordPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirm" className="text-xs font-bold text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호 확인</Label>
+                  <Label htmlFor="confirm" className="text-xs text-zinc-500 uppercase tracking-widest ml-1">새 비밀번호 확인</Label>
                   <Input
                     id="confirm"
                     type="password"
@@ -186,7 +186,9 @@ export default function ChangePasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full h-14 bg-green-500 hover:bg-green-600 text-white rounded-2xl font-bold text-lg transition-all shadow-lg shadow-green-500/30"
+                size="xl"
+                variant="success"
+                className="w-full transition-all"
                 disabled={loading}
               >
                 {loading ? (
