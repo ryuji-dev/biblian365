@@ -13,7 +13,7 @@ export const BIBLE_BOOKS: BibleBook[] = [
     { id: 5, name: "신명기", chapters: 34, category: "Old" },
     { id: 6, name: "여호수아", chapters: 24, category: "Old" },
     { id: 7, name: "사사기", chapters: 21, category: "Old" },
-    { id: 8, name: "루기", chapters: 4, category: "Old" },
+    { id: 8, name: "룻기", chapters: 4, category: "Old" },
     { id: 9, name: "사무엘상", chapters: 31, category: "Old" },
     { id: 10, name: "사무엘하", chapters: 24, category: "Old" },
     { id: 11, name: "열왕기상", chapters: 22, category: "Old" },
