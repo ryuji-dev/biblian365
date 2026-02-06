@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BIBLE_BOOKS, TOTAL_CHAPTERS, BibleBook } from '@/lib/constants/bible';
-import { BookOpen, CheckCircle2, Flame, Target, ChevronDown, ChevronUp, Book, Trophy, RotateCcw } from 'lucide-react';
+import { BookOpen, CheckCircle2, Flame, Target, ChevronDown, ChevronUp, Book, Trophy, RotateCcw, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BibleProgress {
@@ -76,18 +76,19 @@ export function BibleReadingTable({ progress, cumulativeReadCount: initialManual
         ).length;
     }, [optimisticProgress]);
 
-    const incrementRead = async () => {
+    const updateManualCount = async (increment: number) => {
         if (isIncrementing) return;
+        if (increment < 0 && manualCount <= 0) return;
 
         setIsIncrementing(true);
         // Optimistic update
-        setManualCount(prev => prev + 1);
+        setManualCount(prev => prev + increment);
 
         try {
             const resp = await fetch('/api/user/profile/increment-reads', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ increment: 1 }),
+                body: JSON.stringify({ increment }),
             });
 
             if (!resp.ok) {
@@ -96,7 +97,7 @@ export function BibleReadingTable({ progress, cumulativeReadCount: initialManual
             router.refresh();
         } catch (err) {
             console.error(err);
-            setManualCount(prev => prev - 1);
+            setManualCount(prev => prev - increment);
             alert('기록 저장 중 오류가 발생했습니다.');
         } finally {
             setIsIncrementing(false);
@@ -419,13 +420,25 @@ export function BibleReadingTable({ progress, cumulativeReadCount: initialManual
                                 <Trophy className="w-4 h-4 text-yellow-500" />
                                 누적 완독
                             </div>
-                            <button
-                                onClick={incrementRead}
-                                disabled={isIncrementing}
-                                className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded-md hover:bg-primary/20 hover:border-primary/30 transition-all text-zinc-400 hover:text-primary active:scale-95"
-                            >
-                                {isIncrementing ? "보내는 중..." : "+ 1독 추가 (과거 기록)"}
-                            </button>
+                            <div className="flex items-center gap-1.5">
+                                {manualCount > 0 && (
+                                    <button
+                                        onClick={() => updateManualCount(-1)}
+                                        disabled={isIncrementing}
+                                        className="w-6 h-6 flex items-center justify-center bg-yellow-500/5 border border-yellow-500/10 rounded-md hover:bg-yellow-500/20 hover:border-yellow-500/30 transition-all text-yellow-500/60 hover:text-yellow-500 active:scale-95 disabled:opacity-50"
+                                        title="1독 감소"
+                                    >
+                                        <Minus className="w-3 h-3" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => updateManualCount(1)}
+                                    disabled={isIncrementing}
+                                    className="text-[10px] bg-yellow-500/5 border border-yellow-500/10 px-2 py-0.5 h-6 flex items-center rounded-md hover:bg-yellow-500/20 hover:border-yellow-500/30 transition-all text-yellow-500/60 hover:text-yellow-500 active:scale-95 disabled:opacity-50"
+                                >
+                                    {isIncrementing ? "..." : "+ 1독 추가 (과거 기록)"}
+                                </button>
+                            </div>
                         </div>
                     </CardHeader>
                     <CardContent>
