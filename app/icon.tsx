@@ -11,24 +11,26 @@ export const contentType = 'image/png'
 export default function Icon() {
   return new ImageResponse(
     (
+      // 사용자께서 주신 디자인을 그대로 반영 (Tailwind 대신 인라인 스타일)
       <div
         style={{
-          background: '#7c3aed',
+          background: 'hsl(262, 83%, 65%)', // bg-primary
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '25%', // rounded-2xl 느낌
+          color: 'white',
+          borderRadius: '0', // 흰 배경 문제를 위해 Full Square
         }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="22"
-          height="22"
+          width="20" // 32px 기준 약 66%
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
