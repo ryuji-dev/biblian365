@@ -1,29 +1,25 @@
 import { ImageResponse } from 'next/og'
- 
-// Route segment config
+
 export const runtime = 'edge'
- 
-// Image metadata
+
 export const size = {
   width: 32,
   height: 32,
 }
 export const contentType = 'image/png'
- 
-// Image generation
+
 export default function Icon() {
   return new ImageResponse(
     (
-      // ImageResponse 에선 Tailwind 대신 인라인 스타일을 사용합니다.
       <div
         style={{
-          background: '#7c3aed', // primary 보라색 (코바늘 색상)
+          background: '#7c3aed',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          borderRadius: '20%', // 로고와 유사한 둥근 사각형
+          borderRadius: '25%', // rounded-2xl 느낌
         }}
       >
         <svg
@@ -33,7 +29,7 @@ export default function Icon() {
           viewBox="0 0 24 24"
           fill="none"
           stroke="white"
-          strokeWidth="3"
+          strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
@@ -46,9 +42,6 @@ export default function Icon() {
         </svg>
       </div>
     ),
-    // ImageResponse options
-    {
-      ...size,
-    }
+    { ...size }
   )
 }
