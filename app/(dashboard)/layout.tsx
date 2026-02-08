@@ -14,7 +14,8 @@ import {
   LogOut,
   Menu,
   X,
-  BookOpenText
+  BookOpenText,
+  Download
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -74,6 +75,7 @@ export default function DashboardLayout({
     { name: '경건시간', href: '/devotion', icon: Book },
     { name: '성경통독', href: '/reading', icon: BookOpen },
     { name: '프로필', href: '/profile', icon: User },
+    { name: '앱 설치', href: '/install-guide', icon: Download },
   ];
 
   if (userRole === 'admin' || userRole === 'leader') {

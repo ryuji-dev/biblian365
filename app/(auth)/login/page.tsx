@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -129,10 +130,18 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="text-center pt-2">
+          <div className="text-center pt-2 space-y-3">
             <p className="text-xs text-muted-foreground/60">
               비밀번호를 잊으셨나요? <span className="text-primary/60 cursor-pointer hover:text-primary transition-colors">관리자에게 문의하세요.</span>
             </p>
+            <div className="pt-2 border-t border-white/5">
+              <Link
+                href="/install-guide"
+                className="text-xs text-primary/80 hover:text-primary transition-colors inline-flex items-center gap-2"
+              >
+                휴대폰/PC에 앱 설치하는 방법 알아보기 &rarr;
+              </Link>
+            </div>
           </div>
         </div>
 
