@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BookOpen, CheckCircle2, Circle } from "lucide-react";
-import { format, parseISO } from "date-fns";
-import { ko } from "date-fns/locale";
+import { BookOpen } from "lucide-react";
 import { ReadingClient } from "@/components/reading/ReadingClient";
 
 interface ReadingPageProps {

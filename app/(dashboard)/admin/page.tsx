@@ -1,12 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Users, ShieldAlert, History, ChevronLeft, ChevronRight, Settings } from "lucide-react";
-import { AdminClient } from "@/components/admin/AdminClient";
-import { DeleteUserButton } from "@/components/admin/DeleteUserButton";
-import { cn } from "@/lib/utils";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, ShieldAlert, History } from "lucide-react";
 import { Database } from "@/types/database.types";
-import Link from 'next/link';
 import { AdminTabs } from "@/components/admin/AdminTabs";
 import { AccountManagement } from "@/components/admin/AccountManagement";
 import { MemberList } from "@/components/admin/MemberList";

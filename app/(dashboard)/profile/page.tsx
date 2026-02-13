@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { Settings, LogOut, Key } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ChangePasswordModal } from "@/components/auth/ChangePasswordModal";
 

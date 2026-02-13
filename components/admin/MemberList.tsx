@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Database } from '@/types/database.types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ChevronLeft, ChevronRight, History } from 'lucide-react';
+import { ChevronLeft, ChevronRight, History, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { DeleteUserButton } from './DeleteUserButton';
 import { useSearchParams } from 'next/navigation';
@@ -29,21 +29,31 @@ export function MemberList({
   // 하지만 이 컴포넌트는 이미 members 탭일 때만 렌더링되므로, 링크 생성 시 tab=members를 명시하면 됨.
   
   return (
-    <Card className="glass-dark border-white/5 rounded-[2.5rem] overflow-hidden h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <CardHeader className="p-4 md:p-8 pb-4">
-        <CardTitle className="text-2xl text-white font-normal">가입 교우 목록</CardTitle>
+    <Card className="glass-dark border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <CardHeader className="p-8 pb-4">
+        <CardTitle className="text-2xl text-white flex items-center gap-3 font-normal">
+          <Users className="w-6 h-6 text-primary" />
+          가입 교우 목록
+        </CardTitle>
         <CardDescription className="text-zinc-500 font-normal">
           전체 교우 명단입니다. (페이지당 10명)
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-4 pt-0 md:p-8 md:pt-0 flex-1 flex flex-col">
-        <div className="overflow-x-auto flex-1">
+      <CardContent className="px-4 pt-0 md:px-8 md:pt-0 flex flex-col">
+        <div className="overflow-x-auto">
           {/* Mobile View (List) */}
           <div className="md:hidden space-y-px">
-            {memberList?.map((u) => {
+            {memberList?.map((u, index) => {
               const isCheckedIn = todayCheckinData.some(c => c.user_id === u.id);
+              const isLast = index === (memberList?.length || 0) - 1;
               return (
-                <div key={u.id} className="flex items-center gap-3 p-4 border-b border-white/5 bg-transparent">
+                <div 
+                  key={u.id} 
+                  className={cn(
+                    "flex items-center gap-3 p-4 bg-transparent",
+                    !isLast && "border-b border-white/5"
+                  )}
+                >
                   {/* Status */}
                   <div className="shrink-0">
                     {isCheckedIn ? (
@@ -135,7 +145,7 @@ export function MemberList({
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4 mt-8 pt-4 border-t border-white/5 font-normal">
+          <div className="flex items-center justify-center gap-4 mt-4 pt-4 pb-6 px-6 border-t border-white/5 font-normal">
             <Link
               href={`/admin?tab=members&page=${Math.max(1, currentPage - 1)}`}
               className={cn(

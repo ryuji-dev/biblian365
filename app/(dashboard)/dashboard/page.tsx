@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Book, BookOpen, Trophy, Flame } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { BIBLE_BOOKS, TOTAL_CHAPTERS } from '@/lib/constants/bible';
+import { TOTAL_CHAPTERS } from '@/lib/constants/bible';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
