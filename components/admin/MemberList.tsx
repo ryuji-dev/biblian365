@@ -30,15 +30,61 @@ export function MemberList({
   
   return (
     <Card className="glass-dark border-white/5 rounded-[2.5rem] overflow-hidden h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <CardHeader className="p-8 pb-4">
+      <CardHeader className="p-4 md:p-8 pb-4">
         <CardTitle className="text-2xl text-white font-normal">가입 교우 목록</CardTitle>
         <CardDescription className="text-zinc-500 font-normal">
           전체 교우 명단입니다. (페이지당 10명)
         </CardDescription>
       </CardHeader>
-      <CardContent className="p-8 pt-0 flex-1 flex flex-col">
+      <CardContent className="p-4 pt-0 md:p-8 md:pt-0 flex-1 flex flex-col">
         <div className="overflow-x-auto flex-1">
-          <table className="w-full text-left border-collapse">
+          {/* Mobile View (List) */}
+          <div className="md:hidden space-y-px">
+            {memberList?.map((u) => {
+              const isCheckedIn = todayCheckinData.some(c => c.user_id === u.id);
+              return (
+                <div key={u.id} className="flex items-center gap-3 p-4 border-b border-white/5 bg-transparent">
+                  {/* Status */}
+                  <div className="shrink-0">
+                    {isCheckedIn ? (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-green-500/10 text-green-500">
+                        <History className="w-4 h-4" />
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-zinc-800/50 text-zinc-600">
+                        <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-center gap-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-white font-medium truncate">{u.full_name}</span>
+                      <span className={cn(
+                        "px-1.5 py-0.5 rounded text-[10px] font-medium tracking-wide uppercase",
+                        u.role === 'admin' ? "bg-primary/20 text-primary" :
+                        u.role === 'leader' ? "bg-primary/20 text-primary" : "bg-zinc-800 text-zinc-500"
+                      )}>
+                        {u.role === 'admin' ? '목사님' : u.role === 'leader' ? '리더' : '교우'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-zinc-500 truncate font-normal">{u.email}</div>
+                  </div>
+
+                  {/* Action */}
+                  <div className="shrink-0">
+                    {currentUserId !== u.id && (
+                      <DeleteUserButton userId={u.id} userName={u.full_name || ''} />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop View (Table) */}
+          <table className="hidden md:table w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-white/5">
                 <th className="py-4 text-xs font-medium text-zinc-500 uppercase tracking-widest text-center w-16">참여</th>
