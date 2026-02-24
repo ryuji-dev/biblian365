@@ -67,13 +67,16 @@ export function BibleReadingTable({ progress, cumulativeReadCount: initialManual
         return progression;
     }, [optimisticProgress, selectedYear]);
 
-    // 오늘 읽은 장 수 계산 (deleted_at 제외)
+    // 오늘 읽은 장 수 계산 (deleted_at 제외) - 로컬 타임존(KST) 기준 00시~24시
     const todayCount = useMemo(() => {
-        const todayStr = new Date().toISOString().split('T')[0];
-        return optimisticProgress.filter(p =>
-            p.completed_at.startsWith(todayStr) &&
-            !p.deleted_at
-        ).length;
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        return optimisticProgress.filter(p => {
+            if (p.deleted_at) return false;
+            const completedDate = new Date(p.completed_at);
+            const localDateStr = `${completedDate.getFullYear()}-${String(completedDate.getMonth() + 1).padStart(2, '0')}-${String(completedDate.getDate()).padStart(2, '0')}`;
+            return localDateStr === todayStr;
+        }).length;
     }, [optimisticProgress]);
 
     const updateManualCount = async (increment: number) => {
