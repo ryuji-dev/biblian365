@@ -3,6 +3,7 @@ import { CheckinClient } from "@/components/devotion/CheckinClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flame, Calendar as CalendarIcon, Target, Clock } from "lucide-react";
 import { calculateCurrentStreak, calculateLongestStreak } from "@/lib/utils/streak";
+import { getTodayKST, getThisMonthKST } from "@/lib/utils/date";
 
 export default async function DevotionCheckinPage() {
   const supabase = await createClient();
@@ -10,15 +11,17 @@ export default async function DevotionCheckinPage() {
 
   if (!user) return null;
 
-  // 체크인 기록 가져오기 (최근 1년)
-  const oneYearAgo = new Date();
-  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+  // 체크인 기록 가져오기 (최근 1년, KST 기준)
+  const todayKST = getTodayKST();
+  const oneYearAgoDate = new Date(todayKST);
+  oneYearAgoDate.setFullYear(oneYearAgoDate.getFullYear() - 1);
+  const oneYearAgoStr = oneYearAgoDate.toISOString().split('T')[0];
 
   const { data: checkinsData } = await supabase
     .from("devotion_checkins")
     .select("id, checkin_date, duration_minutes, memo, planned_start_time, planned_end_time, start_time, end_time")
     .eq("user_id", user.id)
-    .gte("checkin_date", oneYearAgo.toISOString().split("T")[0])
+    .gte("checkin_date", oneYearAgoStr)
     .order("checkin_date", { ascending: false });
 
   const checkins = checkinsData as any[] | null;
@@ -107,7 +110,7 @@ export default async function DevotionCheckinPage() {
           <CardContent>
             <div className="flex items-end justify-between">
               <div className="text-3xl text-white tracking-tight">
-                {checkinDates.filter(d => d.startsWith(new Date().toISOString().slice(0, 7))).length}회
+                {checkinDates.filter(d => d.startsWith(getThisMonthKST())).length}회
               </div>
               <div className="w-12 h-12 rounded-2xl bg-green-500/10 text-green-500 flex items-center justify-center transition-all duration-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-[0_0_20px_rgba(34,197,94,0.4)]">
                 <CalendarIcon className="w-6 h-6" />

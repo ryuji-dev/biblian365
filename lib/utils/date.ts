@@ -27,11 +27,41 @@ export function formatRelative(date: Date | string): string {
 }
 
 /**
- * 오늘 날짜를 YYYY-MM-DD 형식으로 반환
+ * 한국 표준시(KST, UTC+9) 기준 현재 날짜를 YYYY-MM-DD로 반환
+ * 서버(UTC)와 클라이언트(KST) 모두에서 일관된 날짜를 반환하기 위해 사용
+ */
+export function getTodayKST(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Seoul',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
+}
+
+/**
+ * 한국 표준시(KST) 기준 현재 연월을 YYYY-MM으로 반환
+ */
+export function getThisMonthKST(): string {
+  return getTodayKST().slice(0, 7);
+}
+
+/**
+ * 한국 표준시(KST) 기준 이번 달 첫날을 YYYY-MM-DD로 반환
+ */
+export function getFirstDayOfMonthKST(): string {
+  const today = getTodayKST(); // YYYY-MM-DD
+  return today.slice(0, 7) + '-01';
+}
+
+/**
+ * 오늘 날짜를 YYYY-MM-DD 형식으로 반환 (KST 기준)
+ * @deprecated getTodayKST()를 사용하세요
  */
 export function getToday(): string {
-  return formatDate(new Date());
+  return getTodayKST();
 }
+
 
 /**
  * 두 날짜 사이의 일수 계산

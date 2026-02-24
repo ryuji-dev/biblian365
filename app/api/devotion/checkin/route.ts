@@ -76,10 +76,10 @@ export async function POST(req: NextRequest) {
     // Handle split record for midnight span
     const mainRecord = result.data;
     if (isSpanningMidnight) {
-      // Calculate next day date
-      const nextDate = new Date(checkinDate);
-      nextDate.setDate(nextDate.getDate() + 1);
-      const nextDateStr = nextDate.toISOString().split('T')[0];
+      // 다음날 날짜 계산 (날짜 문자열 YYYY-MM-DD를 직접 연산하여 UTC 시차 벵잡성 제거)
+      const [cy, cm, cd] = checkinDate.split('-').map(Number);
+      const nextDateObj = new Date(Date.UTC(cy, cm - 1, cd + 1));
+      const nextDateStr = nextDateObj.toISOString().split('T')[0];
 
       // Upsert the "tomorrow" part
       // We search for an existing child record by parent_id

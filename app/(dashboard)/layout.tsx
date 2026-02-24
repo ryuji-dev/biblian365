@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useEffect, useState } from 'react';
 import {
-  Home,
+  ChartColumnStacked,
   Book,
   BookOpen,
   User,
@@ -70,7 +70,7 @@ export default function DashboardLayout({
   };
 
   const navigation = [
-    { name: '대시보드', href: '/dashboard', icon: Home },
+    { name: '대시보드', href: '/dashboard', icon: ChartColumnStacked },
     { name: '경건시간', href: '/devotion', icon: Book },
     { name: '성경통독', href: '/reading', icon: BookOpen },
     { name: '프로필', href: '/profile', icon: User },

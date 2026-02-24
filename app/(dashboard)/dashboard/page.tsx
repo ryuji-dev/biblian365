@@ -22,8 +22,8 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single() as { data: { full_name: string; cumulative_readthrough_count: number } | null };
 
-  // 오늘 경건시간 체크 여부
-  const today = new Date().toISOString().split('T')[0];
+  // 오늘 경건시간 체크 여부 (KST 기준으로 날짜 계산)
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
   const { data: todayCheckin } = await supabase
     .from('devotion_checkins')
     .select('id')
@@ -31,16 +31,17 @@ export default async function DashboardPage() {
     .eq('checkin_date', today)
     .single() as { data: { id: string } | null };
 
-  // 이번 달 경건시간 횟수
-  const firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+  // 이번 달 경건시간 횟수 (KST 기준)
+  const todayKST = new Date(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()));
+  const firstDayOfMonth = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(todayKST.getFullYear(), todayKST.getMonth(), 1));
   const { count: monthCheckins } = await supabase
     .from('devotion_checkins')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
     .gte('checkin_date', firstDayOfMonth);
 
-  // 현재 연도 통독 진행률 (user_bible_progress 테이블 기준)
-  const currentYear = new Date().getFullYear();
+  // 현재 연도 통독 진행률 (KST 기준)
+  const currentYear = todayKST.getFullYear();
   const { data: allProgress } = await supabase
     .from('user_bible_progress')
     .select('book_id, chapter, year, deleted_at')
