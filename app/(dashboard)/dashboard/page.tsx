@@ -43,11 +43,22 @@ export default async function DashboardPage() {
 
   // 현재 연도 통독 진행률 (KST 기준)
   const currentYear = new Date(today).getFullYear();
-  const { data: allProgress } = await supabase
-    .from('user_bible_progress')
-    .select('book_id, chapter, year, deleted_at')
-    .eq('user_id', user.id)
-    .is('deleted_at', null) as { data: { book_id: number; chapter: number; year: number; deleted_at: string | null }[] | null };
+  // 페이지네이션으로 1000행 제한 우회
+  const PAGE_SIZE = 1000;
+  let allProgress: { book_id: number; chapter: number; year: number; deleted_at: string | null }[] = [];
+  let progressFrom = 0;
+  while (true) {
+    const { data } = await supabase
+      .from('user_bible_progress')
+      .select('book_id, chapter, year, deleted_at')
+      .eq('user_id', user.id)
+      .is('deleted_at', null)
+      .range(progressFrom, progressFrom + PAGE_SIZE - 1) as { data: { book_id: number; chapter: number; year: number; deleted_at: string | null }[] | null };
+    if (!data || data.length === 0) break;
+    allProgress = allProgress.concat(data);
+    if (data.length < PAGE_SIZE) break;
+    progressFrom += PAGE_SIZE;
+  }
 
   const currentYearProgress = allProgress?.filter(p => Number(p.year) === currentYear) || [];
   const readingProgress = Math.round((currentYearProgress.length / TOTAL_CHAPTERS) * 100);
